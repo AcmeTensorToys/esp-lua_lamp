@@ -1,9 +1,8 @@
 #!/bin/bash
 
 set -e -u
-PUSHCMD="./host/pushvia.expect ${HOST} ${PORT:-23}"
-dopush() { ${PUSHCMD} ${2:-`basename $1`} $1; }
-dopushcompile() { ${PUSHCMD} ${2:-`basename $1`} $1 compile; }
+
+. ./host/pushcommon.sh
 
 dopushcompile net/nwfmqtt.lua
 dopushcompile cap1188/cap1188.lua
