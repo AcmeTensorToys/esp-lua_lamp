@@ -3,8 +3,9 @@ local mqttHeartbeat = 600000
 local mqttUser
 
 -- some exported modules for overlay and REPL use
--- XXX timer 5 reserved for the eventual day that we want animations in lamp-draw.lc
-tq = (dofile "tq.lc")(6)            -- timer 6
+remotetmr = tmr.create()
+touchtmr = tmr.create()
+tq = (dofile "tq.lc")(tmr.create())
 nwfnet = require "nwfnet"
 mqc, mqttUser = dofile("nwfmqtt.lc").mkclient("nwfmqtt.conf")
 local mqttBcastPfx = string.format("lamp/%s/out",mqttUser)
@@ -35,7 +36,12 @@ ledfb_claimed = 0 -- 0 : unclaimed, set remote immediately
 
 isblackout = false
 function dodraw() if not isblackout then ws2812.write(ledfb) end end
-function doremotedraw() if ledfb_claimed > 1 then ledfb_claimed = 2 else ledfb = remotefb; dodraw() end end
+function doremotedraw()
+  if ledfb_claimed > 1
+   then ledfb_claimed = 2
+   else touchtmr:unregister(); ledfb = remotefb; remotetmr:start(); dodraw()
+  end
+end
 
 function leddefault(fb,...) fb:fill(0,0,0); local ix; for ix = 25,32 do fb:set(ix,...) end end
 
@@ -59,7 +65,7 @@ nwfnet.onnet["init"] = function(e,c)
   if     e == "mqttdscn" and c == mqc then
     if mqtt_beat_cancel then mqtt_beat_cancel(); mqtt_beat_cancel = nil end
     if not mqtt_reconn_poller then mqtt_reconn() end
-    dofile("lamp-draw.lc").xx(remotefb,0,5,0); doremotedraw()
+    dofile("lamp-draw.lc").xx(remotetmr,remotefb,0,5,0); doremotedraw()
   elseif e == "mqttconn" and c == mqc then
     if mqtt_reconn_poller then tq:dequeue(mqtt_reconn_poller); mqtt_reconn_poller = nil end
     if not mqtt_beat_cancel then mqtt_beat_cancel = dofile("nwfmqtt.lc").heartbeat(mqc,mqttHeartTopic,tq,mqttHeartbeat) end
@@ -75,15 +81,15 @@ nwfnet.onnet["init"] = function(e,c)
   end
 end
 
+-- initialize display
+dofile("lamp-draw.lc").xx(remotetmr,remotefb,0,5,5); dodraw()
+
 -- touch overlay loader
 function ontouch_load() dofile("lamp-touch.lc") end
 
 -- pin 6 (GPIO12) is cap sensor IRQ (active low)
 -- pin 5 (GPIO14) is cap sensor reset (active low)
 dofile("cap1188-init.lc").init(6,5,ontouch_load)
-
--- initialize display
-dofile("lamp-draw.lc").xx(remotefb,0,5,5); dodraw()
 
 -- initialize network
 dofile("nwfnet-diag.lc")(true)

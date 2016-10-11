@@ -1,4 +1,4 @@
--- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, lamp_announce, tq
+-- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq
 -- assumptions: gpio.trig(6) is the right thing to do for touch IRQs
 
 local touch_tq = (dofile "tq.lc")(5)
@@ -21,6 +21,7 @@ end
 
 local function claimfb()
   if ledfb_claimed == 0 then
+    remotetmr:stop()
     ledfb_claimed = 1
     ledfb = touchfb
   end
@@ -79,8 +80,10 @@ local function ontouchdone()
   -- leave the ledfb pointing at us; it'll get updated eventually,
   -- unless there was a remote message while we were doing our thing
   -- in which case, display it now
-  if ledfb_claimed == 2 then ledfb = remotefb; dodraw() end
-  ledfb_claimed = 0
+  if ledfb_claimed == 2
+   then ledfb_claimed = 0; remotetmr:start(); doremotedraw()
+   else ledfb_claimed = 0
+  end
 end
 
 -- must not change ledfb to touchfb unless the user interacts with us
@@ -128,8 +131,8 @@ local function ontouch()
 
   -- draw if we've claimed it!
   if ledfb == touchfb then
-    touchfns[touchfnix](touchfb,touchcolorvec(touchcolor))
-    dodraw()
+    touchfns[touchfnix](touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
+    touchtmr:start()
   end
 end
 

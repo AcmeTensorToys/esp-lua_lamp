@@ -1,7 +1,8 @@
--- GLOBAL: tq, remotefb, leddefault, doremotedraw, mqtt_revert
+-- GLOBAL: tq, remotefb, leddefault, doremotedraw, mqtt_revert, remotetmr
 
 local function ledrevert(ix)
   if ix < 3 then
+    remotetmr:unregister() 
     remotefb:fade(2) doremotedraw()
     tq:queue(500,function() ledrevert(ix+1) end)
   else leddefault(remotefb,0,16,16) end
@@ -15,8 +16,8 @@ return function(m)
   if ix then
     g = tonumber(g,16); r = tonumber(r,16); b = tonumber(b,16)
     local f = loadfile "lamp-draw.lc"
-    local fn = f and type(f) == "table" and f[m]
-    if fn then fn(doremotedraw,remotefb,g,r,b)
+    local fn = f and f()[m]
+    if fn then fn(remotetmr,remotefb,g,r,b); doremotedraw()
      else remotefb:fill(g,r,b); doremotedraw() -- failsafe
     end
     -- if there's a duration set, register a timer to reset the display to the default
