@@ -46,7 +46,7 @@ end
 function leddefault(fb,...) fb:fill(0,0,0); local ix; for ix = 25,32 do fb:set(ix,...) end end
 
 -- MQTT-driven local setting
-local mqtt_revert = nil
+mqtt_revert = nil
 nwfnet.onmqtt["lamp"] = function(c,t,m) if t and m and t:find("^lamp/[^/]+/out") then dofile("lamp-remote.lc")(m) end end
 
 -- TODO: messages to specific lamps?  Multiple brokers?
