@@ -47,8 +47,11 @@ return {
     fb:set(21,c) fb:set(30,c)
     t:register(500,tmr.ALARM_AUTO,function()
       if ix == 1
-        then fb:set( 1,c) fb:set( 2,0,0,0) fb:set( 3,c) fb:set( 9,0,0,0) fb:set(11,0,0,0) fb:set(17,c) fb:set(18,0,0,0) fb:set(19,c)
-	else fb:set( 1,0,0,0) fb:set( 2,c) fb:set( 3,0,0,0) fb:set( 9,c) fb:set(11,c) fb:set(17,0,0,0) fb:set(18,c) fb:set(19,0,0,0)
+        then fb:set( 1,c) fb:set( 2,0,0,0) fb:set( 3,c)
+	fb:set( 9,0,0,0) fb:set(11,0,0,0) fb:set(17,c) fb:set(18,0,0,0)
+	fb:set(19,c)
+	else fb:set( 1,0,0,0) fb:set( 2,c) fb:set( 3,0,0,0) fb:set( 9,c)
+	fb:set(11,c) fb:set(17,0,0,0) fb:set(18,c) fb:set(19,0,0,0)
       end
       ix = 1 - ix
       dodraw()
@@ -78,18 +81,18 @@ return {
     fb:fill(0,0,0)
     local ix = 0
     local c = string.char(g,r,b)
-    local b = string.char(0,0,0)
+    local x = string.char(0,0,0)
     fb:set( 3,c) fb:set( 8,c) fb:set(10,c) fb:set(15,c)
     fb:set(17,c) fb:set(18,c) fb:set(22,c) fb:set(23,c)
     fb:set(27,c) fb:set(28,c) fb:set(29,c) fb:set(32,c)
     t:register(1000,tmr.ALARM_AUTO, function()
       if ix == 1
-        then fb:set( 1,c) fb:set( 3,b) fb:set( 6,c) fb:set( 8,b)
-            fb:set(17,b) fb:set(19,c) fb:set(22,b) fb:set(24,c)
-            fb:set(25,c) fb:set(27,b) fb:set(30,c) fb:set(32,b)
-	else fb:set( 1,b) fb:set( 3,c) fb:set( 6,b) fb:set( 8,c)
-            fb:set(17,c) fb:set(19,b) fb:set(22,c) fb:set(24,b)
-            fb:set(25,b) fb:set(27,c) fb:set(30,b) fb:set(32,c)
+        then fb:set( 1,c) fb:set( 3,x) fb:set( 6,c) fb:set( 8,x)
+            fb:set(17,x) fb:set(19,c) fb:set(22,x) fb:set(24,c)
+            fb:set(25,c) fb:set(27,x) fb:set(30,c) fb:set(32,x)
+	else fb:set( 1,x) fb:set( 3,c) fb:set( 6,x) fb:set( 8,c)
+            fb:set(17,c) fb:set(19,x) fb:set(22,c) fb:set(24,x)
+            fb:set(25,x) fb:set(27,c) fb:set(30,x) fb:set(32,c)
       end
       ix = 1 - ix
       dodraw()
