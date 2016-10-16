@@ -1,4 +1,4 @@
--- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq
+-- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
 -- assumptions: gpio.trig(6) is the right thing to do for touch IRQs
 
 local touch_tq = (dofile "tq.lc")(5)
@@ -8,15 +8,16 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchcolor  = 40
 local touchfns    = { }
-local touchfnsenc = { }
 local touchfnix = 1
 
 -- Whip through the drawing functions and build indexes
 local k,v
-for k,v in pairs(dofile("lamp-draw.lc")) do
-  touchfns   [#touchfns+1   ] = v
-  touchfnsenc[#touchfnsenc+1] = k
-  if k == "fill" then touchfnix = #touchfns end
+for k,v in pairs(file.list()) do
+  local ix, _, meth = k:find("^draw%-(%w+)%.lc$")
+  if ix then
+    touchfns[#touchfns+1] = meth
+    if meth == "fill" then touchfnix = #touchfns end
+  end
 end
 
 local function claimfb()
@@ -74,7 +75,7 @@ local function ontouchdone()
       cap:mr(0x72,set30) -- link
     end)
 
-    lamp_announce(touchfnsenc[touchfnix],touchcolorvec(touchcolor))
+    lamp_announce(touchfns[touchfnix],touchcolorvec(touchcolor))
   end
 
   -- leave the ledfb pointing at us; it'll get updated eventually,
@@ -131,7 +132,8 @@ local function ontouch()
 
   -- draw if we've claimed it!
   if ledfb == touchfb then
-    touchfns[touchfnix](touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
+    touchtmr:unregister()
+    loaddrawfn(touchfns[touchfnix])(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
     touchtmr:start()
   end
 end

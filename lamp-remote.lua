@@ -1,4 +1,4 @@
--- GLOBAL: tq, remotefb, leddefault, doremotedraw, mqtt_revert, remotetmr
+-- GLOBAL: tq, remotefb, leddefault, doremotedraw, mqtt_revert, remotetmr, loaddrawfn
 
 local function ledrevert(ix)
   if ix < 3 then
@@ -9,17 +9,16 @@ local function ledrevert(ix)
   dodraw()
 end
 
-return function(m)
+return function(msg)
   if mqtt_revert then tq:dequeue(mqtt_revert) end
 
-  local ix, _, d, m, r, g, b = m:find("^(%d+)%s+(%w+)%s+(%x+)%s+(%x+)%s+(%x+)%s*$")
+  local ix, _, d, m, r, g, b = msg:find("^(%d+)%s+(%w+)%s+(%x+)%s+(%x+)%s+(%x+)%s*$")
   if ix then
     g = tonumber(g,16); r = tonumber(r,16); b = tonumber(b,16)
-    local f = loadfile "lamp-draw.lc"
-    local fn = f and f()[m]
-    if fn then fn(remotetmr,remotefb,g,r,b); doremotedraw()
-     else remotefb:fill(g,r,b); doremotedraw() -- failsafe
-    end
+
+    remotetmr:unregister()
+    loaddrawfn(m)(remotetmr,remotefb,g,r,b); doremotedraw()
+
     -- if there's a duration set, register a timer to reset the display to the default
     local dn = tonumber(d)
     if dn and dn > 0 then tq:queue(math.min(dn,6870947),ledrevert,0) end
