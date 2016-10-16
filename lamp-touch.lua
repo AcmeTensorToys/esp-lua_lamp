@@ -1,7 +1,6 @@
 -- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
 -- assumptions: gpio.trig(6) is the right thing to do for touch IRQs
 
-local touch_tq = (dofile "tq.lc")(5)
 local touchfb = ws2812.newBuffer(32,3)
 local touch_fini = nil
 local touch_db_blackout = nil
@@ -15,7 +14,6 @@ local k,v
 for k,v in pairs(file.list()) do
   local ix, _, meth = k:find("^draw%-(%w+)%.lc$")
   if ix then
-    print("XXXXX touching", meth, #touchfns)
     touchfns[#touchfns+1] = meth
     if meth == "fill" then touchfnix = #touchfns end
   end
@@ -92,15 +90,15 @@ end
 local function ontouch()
   local _, down = cap:rt()
 
-  if touch_fini ~= nil then touch_tq:dequeue(touch_fini) end
+  if touch_fini ~= nil then tq:dequeue(touch_fini) end
 
   -- nothing down, kick off timer for touch done
-  if down == 0 then touch_fini = touch_tq:queue(1500,ontouchdone) end
+  if down == 0 then touch_fini = tq:queue(1500,ontouchdone) end
 
   -- back right button: display toggle once per touch of button
   if bit.isset(down,0) then
-    if touch_db_blackout == nil then toggleblackout() else touch_tq:dequeue(touch_db_blackout) end
-    touch_db_blackout = touch_tq:queue(300,onblackdebounce)
+    if touch_db_blackout == nil then toggleblackout() else tq:dequeue(touch_db_blackout) end
+    touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 
   if not isblackout then
@@ -123,10 +121,10 @@ local function ontouch()
       if touch_db_fn == nil then
        touchfnix = touchfnix + 1
        if touchfnix > #touchfns then touchfnix = 1 end
-       touch_db_fn = touch_tq:queue(200,onfndebounce)
-       print("the function is now", touch_db_fn)
+       touch_db_fn = tq:queue(200,onfndebounce)
       end
       claimfb()
+    elseif touch_db_fn then tq:dequeue(touch_db_fn); touch_db_fn = nil
     end
   end
 
@@ -137,8 +135,6 @@ local function ontouch()
   print("ahhhh", ledfb, touchfb)
   if ledfb == touchfb then
     touchtmr:unregister()
-    print("XXXXX looking for XXXXX")
-    print(touchfnix)
     loaddrawfn(touchfns[touchfnix])(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
     touchtmr:start()
   end

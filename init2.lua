@@ -14,9 +14,7 @@ cap = require "cap1188"
 
 local function drawfailsafe(t,fb,g,r,b) fb:fill(g,r,b) end
 function loaddrawfn(name)
-  print("The name is ")
-  print(name)
-  local f = loadfile (string.format("draw-%s.lc", name))
+  local f = loadfile (string.format("draw-%s.lc",name))
   local fn = f and f()
   if fn then return fn else return drawfailsafe end
 end

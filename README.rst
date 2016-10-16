@@ -94,8 +94,11 @@ At present, there are four used touch channels:
 
 * A "blackout" button, which disables drawing to the display and any other
   user interaction until touched again.  This button may be toggled at most
-  once per touch interaction; once toggled, the user must allow the touch
-  handler to timeout.  This provides a crude "debounce" facility and allows
+  once per touch; once toggled, the system will not toggle blackout again
+  until the touch sensor has been untouched for a timeout (see
+  ``touch_db_blackout``).
+  
+  This provides a crude "debounce" facility and allows
   for things like moving the lamp to a new surface (with new conductive
   properties) by gripping it in a way that touches this sensor and holding
   it on the new surface for some seconds to allow the CAP1188 to
@@ -105,8 +108,13 @@ At present, there are four used touch channels:
   and, if both are active, the wheel advances "slowly".
 
 * A shape selector toggle.  This advances through the collections of
-  drawings enumerated at the beginning of a touch event.  Each separate
-  interaction will reload the list for ease of development.
+  drawings enumerated at the beginning of a touch event.  This interaction
+  is rate-limited, so that holding the button will only slowly advance
+  through the space of drawings (see ``touch_db_fn``).  Note that releasing
+  the button immediately clears the timeout, unlike blackout above.
+  
+  Each separate touch interaction will reload the list for ease of
+  development.
 
 Notes
 #####
