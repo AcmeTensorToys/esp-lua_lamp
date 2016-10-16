@@ -123,6 +123,7 @@ local function ontouch()
        touch_db_fn = tq:queue(200,onfndebounce)
       end
       claimfb()
+    elseif touch_db_fn then tq:dequeue(touch_db_fn); touch_db_fn = nil
     end
   end
 
