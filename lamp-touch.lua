@@ -13,8 +13,9 @@ local touchfnix = 1
 -- Whip through the drawing functions and build indexes
 local k,v
 for k,v in pairs(file.list()) do
-  local ix, _, meth = k:find("^draw-(%w+)\\.lc$")
+  local ix, _, meth = k:find("^draw%-(%w+)%.lc$")
   if ix then
+    print("XXXXX touching", meth, #touchfns)
     touchfns[#touchfns+1] = meth
     if meth == "fill" then touchfnix = #touchfns end
   end
@@ -118,10 +119,12 @@ local function ontouch()
 
     -- front middle: mode select (rate-limited, not exactly debounced)
     if bit.isset(down,3) then
+      print("front middle touched", touch_db_fn)
       if touch_db_fn == nil then
        touchfnix = touchfnix + 1
        if touchfnix > #touchfns then touchfnix = 1 end
        touch_db_fn = touch_tq:queue(200,onfndebounce)
+       print("the function is now", touch_db_fn)
       end
       claimfb()
     end
@@ -131,8 +134,11 @@ local function ontouch()
   -- if bit.isset(down,4) then end
 
   -- draw if we've claimed it!
+  print("ahhhh", ledfb, touchfb)
   if ledfb == touchfb then
     touchtmr:unregister()
+    print("XXXXX looking for XXXXX")
+    print(touchfnix)
     loaddrawfn(touchfns[touchfnix])(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
     touchtmr:start()
   end

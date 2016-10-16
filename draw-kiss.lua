@@ -1,4 +1,4 @@
-return  function(t,fb,g,r,b)
+return function(t,fb,g,r,b)
   t:unregister()
   fb:fill(0,0,0)
   local ix = 0
