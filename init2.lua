@@ -12,6 +12,14 @@ local mqttBcastPfx = string.format("lamp/%s/out",mqttUser)
 local mqttHeartTopic = string.format("lamp/%s/boot",mqttUser)
 cap = require "cap1188"
 
+local function drawfailsafe(t,fb,g,r,b) fb:fill(g,r,b) end
+function loaddrawfn(name)
+  local f = loadfile ("draw-%s.lc":format(name))
+  local fn = f and f()
+  if fn then return fn else return drawfailsafe end
+end
+
+
 -- telnetd overlay
 tcpserv = net.createServer(net.TCP, 120)
 tcpserv:listen(23,function(k)
@@ -65,7 +73,8 @@ nwfnet.onnet["init"] = function(e,c)
   if     e == "mqttdscn" and c == mqc then
     if mqtt_beat_cancel then mqtt_beat_cancel(); mqtt_beat_cancel = nil end
     if not mqtt_reconn_poller then mqtt_reconn() end
-    dofile("lamp-draw.lc").xx(remotetmr,remotefb,0,5,0); doremotedraw()
+    remotetmr:unregister()
+    loaddrawfn("xx")(remotetmr,remotefb,0,5,0); doremotedraw()
   elseif e == "mqttconn" and c == mqc then
     if mqtt_reconn_poller then tq:dequeue(mqtt_reconn_poller); mqtt_reconn_poller = nil end
     if not mqtt_beat_cancel then mqtt_beat_cancel = dofile("nwfmqtt.lc").heartbeat(mqc,mqttHeartTopic,tq,mqttHeartbeat) end
@@ -82,7 +91,7 @@ nwfnet.onnet["init"] = function(e,c)
 end
 
 -- initialize display
-dofile("lamp-draw.lc").xx(remotetmr,remotefb,0,5,5); dodraw()
+loaddrawfn("xx")(remotetmr,remotefb,0,5,5); dodraw()
 
 -- touch overlay loader
 function ontouch_load() dofile("lamp-touch.lc") end
