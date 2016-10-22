@@ -10,7 +10,7 @@ return function(t,fb,g,r,b)
   local ix = 2 -- since we start effectively in state 1...
   local c = string.char(g,r,b)
   local ft = {   -- flatten out
-               [1] = function() fb:set(27,c) fb:set(19,0,0,0) end
+               [1] = function() fb:set(25,c) fb:set(27,c) fb:set(17,0,0,0) fb:set(19,0,0,0) end
                  -- stay that way
              , [2] = function() end
                  -- look back
@@ -24,9 +24,9 @@ return function(t,fb,g,r,b)
                  -- slither 2
              , [6] = function() fb:set(19,c) fb:set(20,0,0,0) fb:set(27,0,0,0) fb:set(28,c) end
                  -- slither 1, heart off
-             , [7] = function() fb:set(20,c) fb:set(28,0,0,0) fb:set(14,0,0,0) end
+             , [7] = function() fb:set(18,c) fb:set(19,0,0,0) fb:set(20,c) fb:set(26,0,0,0) fb:set(27,c) fb:set(28,0,0,0) fb:set(14,0,0,0) end
                  -- slither 2
-             , [8] = function() fb:set(19,c) fb:set(20,0,0,0) fb:set(27,0,0,0) fb:set(28,c) end
+             , [8] = function() fb:set(17,c) fb:set(18,0,0,0) fb:set(19,c) fb:set(20,0,0,0) fb:set(25,0,0,0) fb:set(26,c) fb:set(27,0,0,0) fb:set(28,c) end
              }
   fb:fill(0,0,0)
   fb:set(25,c) fb:set(26,c) fb:set(27,c) fb:set(28,c) fb:set(29,c) fb:set(30,c)
