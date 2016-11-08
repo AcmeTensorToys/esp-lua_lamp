@@ -1,5 +1,4 @@
-return  function(t,fb,g,r,b)
-    t:unregister()
+return function(t,fb,g,r,b)
     fb:fill(0,0,0)
     local ix = 0
     local c = string.char(g,r,b)
