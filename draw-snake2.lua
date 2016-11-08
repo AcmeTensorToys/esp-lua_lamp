@@ -3,8 +3,8 @@
 --    1 2 3 4 5 6 7 8
 -- 00 o o o o o h x h
 -- 08 o o o o o e x o
--- 16 o o w w o o x o
--- 24 x x w w x x x o
+-- 16 w w w w o o x o
+-- 24 w w w w x x x o
 --
 return function(t,fb,g,r,b)
   local ix = 2 -- since we start effectively in state 1...
@@ -23,9 +23,9 @@ return function(t,fb,g,r,b)
              , [5] = function() fb:set(20,c) fb:set(28,0,0,0) end
                  -- slither 2
              , [6] = function() fb:set(19,c) fb:set(20,0,0,0) fb:set(27,0,0,0) fb:set(28,c) end
-                 -- slither 1, heart off
+                 -- slither 3, heart off
              , [7] = function() fb:set(18,c) fb:set(19,0,0,0) fb:set(20,c) fb:set(26,0,0,0) fb:set(27,c) fb:set(28,0,0,0) fb:set(14,0,0,0) end
-                 -- slither 2
+                 -- slither 4
              , [8] = function() fb:set(17,c) fb:set(18,0,0,0) fb:set(19,c) fb:set(20,0,0,0) fb:set(25,0,0,0) fb:set(26,c) fb:set(27,0,0,0) fb:set(28,c) end
              }
   fb:fill(0,0,0)

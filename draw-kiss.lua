@@ -1,5 +1,8 @@
+-- 1 0 1 - - - - -
+-- 0 x 0 - - x - -
+-- 1 0 1 x x - - -
+-- - - - - - x - -
 return function(t,fb,g,r,b)
-  t:unregister()
   fb:fill(0,0,0)
   local ix = 0
   local c = string.char(g,r,b)

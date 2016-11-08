@@ -51,6 +51,29 @@ stack the RGB array atop the ESP8266 and hookup via the Doubler's female
 headers, or do away with the Doubler entirely and hook the male pins on the
 ESP8266, etc.
 
+ESP IO
+######
+
+The various boards are interfaced as follows:
+
++--------------+----------------------------------------------------------+
+| ESP GPIO Pin | Function                                                 |
++--------------+----------------------------------------------------------+
+| 2            | WS2812 serial shift out (to LED array input)             |
++--------------+----------------------------------------------------------+
+| 4            | I2C SDA pin (to CAP1188, optional expansion)             |
++--------------+----------------------------------------------------------+
+| 5            | I2C SCL pin (to CAP1188, optional expansion)             |
++--------------+----------------------------------------------------------+
+| 12           | CAP1188 IRQ (from CAP1188)                               |
++--------------+----------------------------------------------------------+
+| 14           | CAP1188 RESET (to CAP1188)                               |
++--------------+----------------------------------------------------------+
+
+If GPIO becomes precious, the CAP1188 IRQ and RESET pins could be moved
+behind an I2C IO expander as they are low bandwidth.  (The expander itself
+would presumably merit an IRQ pin and the CAP1188 IRQ could be demuxed.)
+
 Theory of Operation
 ###################
 

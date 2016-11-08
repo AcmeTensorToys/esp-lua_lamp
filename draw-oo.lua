@@ -1,5 +1,4 @@
  return function(t,fb,g,r,b)
-   t:unregister()
    fb:fill(0,0,0)
    local c = string.char(g,r,b)
    fb:set( 2,c) fb:set( 3,c) fb:set( 6,c) fb:set( 7,c)
