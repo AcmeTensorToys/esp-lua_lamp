@@ -58,7 +58,7 @@ mqtt_revert = nil
 nwfnet.onmqtt["lamp"] = function(c,t,m) if t and m and t:find("^lamp/[^/]+/out") then dofile("lamp-remote.lc")(m) end end
 
 -- TODO: messages to specific lamps?  Multiple brokers?
-function lamp_announce(fn,g,r,b) mqc:publish(mqttBcastPfx,string.format("0 %s %x %x %x",fn,r,g,b),1,1) end
+function lamp_announce(fn,g,r,b) mqc:publish(mqttBcastPfx,string.format("0 %s %x %x %x ;",fn,r,g,b),1,1) end
 
 -- mqtt setup
 local mqtt_beat_cancel
