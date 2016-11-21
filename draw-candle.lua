@@ -11,7 +11,7 @@ return function(t,fb,g,r,b)
   fb:fill(0,0,0)
   -- static base
   local i,v
-  for i,v in ipairs({18,23,26,27,28,29,30,31}) do fb:set(v,2,2,2) end -- white (W)
+  for i,v in ipairs({18,23,26,27,28,29,30,31}) do fb:set(v,2,2,1) end -- whiteish (W)
   for i,v in ipairs({10,15,19,20,21,22})       do fb:set(v,1,1,1) end -- dim white (w)
 
   local cmax = math.max(r,g,b)
@@ -35,6 +35,6 @@ return function(t,fb,g,r,b)
   local function drawrb() drawbiased(5,13) end
 
   local ft = { [0] = draweq, draweq, draweq, drawbb, drawlb, drawrb }
-  t:register(250,tmr.ALARM_AUTO,function() ft[math.random(#ft)]() dodraw() end)
+  t:register(125,tmr.ALARM_AUTO,function() ft[math.random(#ft)]() dodraw() end)
   draweq()
 end
