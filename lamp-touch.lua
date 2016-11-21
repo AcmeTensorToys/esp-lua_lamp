@@ -108,8 +108,8 @@ local function ontouch()
       if bit.isset(down,2) then touchcolor = touchcolor + 1 else touchcolor = touchcolor + 2 end
       claimfb()
     else
-      -- go backward, slowly
-      if bit.isset(down,2) then touchcolor = touchcolor - 1; claimfb() end
+      -- go backward, slowly (unless mode select; see below)
+      if bit.isset(down,2) and bit.isclear(down,3) then touchcolor = touchcolor - 1; claimfb() end
     end
     if     touchcolor >= 48 then touchcolor = touchcolor - 48
     elseif touchcolor < 0  then touchcolor = touchcolor + 48
@@ -119,8 +119,12 @@ local function ontouch()
     if bit.isset(down,3) then
       print("front middle touched", touch_db_fn)
       if touch_db_fn == nil then
-       touchfnix = touchfnix + 1
+       if bit.isset(down,2)
+        then touchfnix = touchfnix - 1
+        else touchfnix = touchfnix + 1
+       end
        if touchfnix > #touchfns then touchfnix = 1 end
+       if touchfnix <= 0 then touchfnix = #touchfns end
        touch_db_fn = tq:queue(200,onfndebounce)
       end
       claimfb()
@@ -132,7 +136,6 @@ local function ontouch()
   -- if bit.isset(down,4) then end
 
   -- draw if we've claimed it!
-  print("ahhhh", ledfb, touchfb)
   if ledfb == touchfb then
     touchtmr:unregister()
     loaddrawfn(touchfns[touchfnix])(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
