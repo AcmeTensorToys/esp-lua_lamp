@@ -1,13 +1,18 @@
 -- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
+--
+-- globals asserted: touchcolor, touchlastfn
+--
 -- assumptions: gpio.trig(6) is the right thing to do for touch IRQs
 
 local touchfb = ws2812.newBuffer(32,3)
 local touch_fini = nil
 local touch_db_blackout = nil
 local touch_db_fn = nil
-local touchcolor  = 40
 local touchfns    = { }
 local touchfnix = 1
+
+if touchcolor == nil then touchcolor = 40 end
+if touchlastfn == nil then touchlastfn = "fill" end
 
 -- Whip through the drawing functions and build indexes
 local k,v
@@ -15,7 +20,7 @@ for k,v in pairs(file.list()) do
   local ix, _, meth = k:find("^draw%-(%w+)%.lc$")
   if ix then
     touchfns[#touchfns+1] = meth
-    if meth == "fill" then touchfnix = #touchfns end
+    if meth == touchlastfn then touchfnix = #touchfns end
   end
 end
 
@@ -138,7 +143,8 @@ local function ontouch()
   -- draw if we've claimed it!
   if ledfb == touchfb then
     touchtmr:unregister()
-    loaddrawfn(touchfns[touchfnix])(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
+    touchlastfn = touchfns[touchfnix]
+    loaddrawfn(touchlastfn)(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
     touchtmr:start()
   end
 end
