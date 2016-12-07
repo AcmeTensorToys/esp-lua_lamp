@@ -25,7 +25,7 @@ return function(t,fb,g,r,b)
     local ag = adjust(g,bias)
     local ar = adjust(r,bias)
     local ab = adjust(b,bias)
-    for i,v in ipairs(arg) do fb:set(v,ag,ar,ab) end
+    for i,v in ipairs{...} do fb:set(v,ag,ar,ab) end
   end
 
   -- flame (f) behaviors: equal intensity, dimmer top, dimmer left, and dimmer right

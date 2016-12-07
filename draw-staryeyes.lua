@@ -12,7 +12,7 @@ return function(t,fb,g,r,b)
     local ag = adjust(g,bias)
     local ar = adjust(r,bias)
     local ab = adjust(b,bias)
-    for i,v in ipairs(arg) do fb:set(v,ag,ar,ab) end
+    for i,v in ipairs{...} do fb:set(v,ag,ar,ab) end
   end
 
   local function drawEq() for i,v in ipairs({3,6}) do fb:set(v,g,r,b) end end
