@@ -9,26 +9,27 @@
 return function(t,fb,g,r,b)
   local ix = 2 -- since we start effectively in state 1...
   local c = string.char(g,r,b)
+  local z = string.char(0,0,0)
   local ft = {   -- flatten out
-               [1] = function() fb:set(25,c) fb:set(27,c) fb:set(17,0,0,0) fb:set(19,0,0,0) end
+               [1] = function() fb:set(25,c) fb:set(27,c) fb:set(17,z) fb:set(19,z) end
                  -- stay that way
              , [2] = function() end
                  -- look back
-             , [2] = function() fb:set(6,c) fb:set(8,0,0,0) end
+             , [2] = function() fb:set(6,c) fb:set(8,z) end
                  -- look forward
-             , [3] = function() fb:set(6,0,0,0) fb:set(8,c) end
+             , [3] = function() fb:set(6,z) fb:set(8,c) end
                  -- heart on (like what we see)
-             , [4] = function() fb:set(14,0,0xf,0) end
+             , [4] = function() fb:set(14,0,15,0) end
                  -- slither 1
-             , [5] = function() fb:set(20,c) fb:set(28,0,0,0) end
+             , [5] = function() fb:set(20,c) fb:set(28,z) end
                  -- slither 2
-             , [6] = function() fb:set(19,c) fb:set(20,0,0,0) fb:set(27,0,0,0) fb:set(28,c) end
+             , [6] = function() fb:set(19,c) fb:set(20,z) fb:set(27,z) fb:set(28,c) end
                  -- slither 3, heart off
-             , [7] = function() fb:set(18,c) fb:set(19,0,0,0) fb:set(20,c) fb:set(26,0,0,0) fb:set(27,c) fb:set(28,0,0,0) fb:set(14,0,0,0) end
+             , [7] = function() fb:set(18,c) fb:set(19,z) fb:set(20,c) fb:set(26,z) fb:set(27,c) fb:set(28,z) fb:set(14,z) end
                  -- slither 4
-             , [8] = function() fb:set(17,c) fb:set(18,0,0,0) fb:set(19,c) fb:set(20,0,0,0) fb:set(25,0,0,0) fb:set(26,c) fb:set(27,0,0,0) fb:set(28,c) end
+             , [8] = function() fb:set(17,c) fb:set(18,z) fb:set(19,c) fb:set(20,z) fb:set(25,z) fb:set(26,c) fb:set(27,z) fb:set(28,c) end
              }
-  fb:fill(0,0,0)
+  fb:fill(z)
   fb:set(25,c) fb:set(26,c) fb:set(27,c) fb:set(28,c) fb:set(29,c) fb:set(30,c)
   fb:set(23,c) fb:set(15,c) fb:set(7,c) fb:set(8,c)
   t:register(500,tmr.ALARM_AUTO,function()
