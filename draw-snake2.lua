@@ -29,7 +29,7 @@ return function(t,fb,g,r,b)
                  -- slither 4
              , [8] = function() fb:set(17,c) fb:set(18,z) fb:set(19,c) fb:set(20,z) fb:set(25,z) fb:set(26,c) fb:set(27,z) fb:set(28,c) end
              }
-  fb:fill(z)
+  fb:fill(0,0,0)
   fb:set(25,c) fb:set(26,c) fb:set(27,c) fb:set(28,c) fb:set(29,c) fb:set(30,c)
   fb:set(23,c) fb:set(15,c) fb:set(7,c) fb:set(8,c)
   t:register(500,tmr.ALARM_AUTO,function()
