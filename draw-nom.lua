@@ -29,7 +29,7 @@ return function(t,fb,g,r,b)
 	     , [15] = function() fb:set(15,z) fb:set(23,z) fb:set(1,c) fb:set(25,c) end
 	     , [16] = function() fb:set(1,z) fb:set(25,z) fb:set(9,c) fb:set(17,c) end
              }
-  fb:fill(z)
+  fb:fill(0,0,0)
   fb:set(9,c) fb:set(17,c) fb:set(2,c) fb:set(26,c) fb:set(29,c)
   t:register(500,tmr.ALARM_AUTO,function()
     ft[ix]()
