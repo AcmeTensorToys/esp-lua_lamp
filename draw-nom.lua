@@ -30,7 +30,7 @@ return function(t,fb,g,r,b)
 	     , [16] = function() fb:set(1,z) fb:set(25,z) fb:set(9,c) fb:set(17,c) end
              }
   fb:fill(0,0,0)
-  fb:set(9,c) fb:set(17,c) fb:set(2,c) fb:set(26,c) fb:set(29,c)
+  fb:set(9,c) fb:set(17,c) fb:set(2,c) fb:set(26,c)
   t:register(500,tmr.ALARM_AUTO,function()
     ft[ix]()
     ix = (ix == 16 and 1) or ix + 1
