@@ -19,10 +19,21 @@ function printerr(...)
   io.stderr:write(s)
 end
 
--- Emulate tq with facilities available thanks to cqueues
+-- Emulate tq with facilities available thanks to cqueues.
+--
+-- It might be OK that we don't (and can't) cancel the coroutines spawned
+-- by arm because the callback is observably idempotent, but it keeps extras
+-- laying around, and they might accumulate without bound.  So we have a
+-- notion of which callback was registered last and the others turn into
+-- NOPs by comparing the current callback against the value we closed over.
 tq = dofile("tq/tq.lua")(nil)
+tq.__emu_lastcb = 0
 tq.now = function() return cq.monotime() * 1000000 end
-tq.arm = function(self,fn,t) cqc:wrap(function() cq.poll(t/1000) ; fn() end) end
+tq.arm = function(self,fn,t)
+  local cbix = tq.__emu_lastcb + 1
+  tq.__emu_lastcb = cbix
+  cqc:wrap(function() cq.poll(t/1000) ; if tq.__emu_lastcb == cbix then fn() end end)
+end
 
 -- how backwards is this!?  We are using tq as faked above for tmr support
 -- since it's not obvious to me how to remove pending events in cqueues.
