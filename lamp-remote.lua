@@ -54,6 +54,6 @@ return function(msg)
   -- "new").
   local c,as
   for c,as in msg:gmatch("(%w*)%s*([^;]*);%s*") do
-    if c then vt[c](as) end
+    if c and vt[c] then vt[c](as) end
   end
 end
