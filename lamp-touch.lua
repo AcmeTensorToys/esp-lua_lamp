@@ -10,6 +10,7 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchfns    = { }
 local touchfnix = 1
+local dimfactor = 1
 
 if touchcolor == nil then touchcolor = 40 end
 if touchlastfn == nil then touchlastfn = "fill" end
@@ -51,12 +52,82 @@ local function setblackout(nb)
 end
 local function toggleblackout() setblackout(not isblackout) end
 
+local function dimdisplay()
+  dimfactor = dimfactor + 10
+  dimfactor = dimfactor % 100
+end
+
 local function touchcolorvec(c)
   local r, g, b
   local cm = c % 16
   if     c < 16 then r = 15 - cm; g = cm; b = 0
   elseif c < 32 then r = 0; g = 15 - cm; b = cm
   else               r = cm; g = 0; b = 15 - cm
+  end
+  if (dimfactor > 0) then
+    print("before green is ", g)
+    print("before blue is ", b)
+    local h = 0
+    local s = 0
+    local l = 0
+    local maxcolor = math.max(r,g,b)
+    local mincolor = math.min(r,g,b)
+    local delta = maxcolor - mincolor
+    l = math.floor((maxcolor + mincolor)/2)
+
+    if (maxcolor == r) then
+      h = (math.floor(((g)-(b))/delta) % 6)
+    else if (maxcolor == g) then
+      h = (math.floor(((b)- (r))/delta) + 2)
+    else if (maxcolor == b) then
+      h = (math.floor(((r)- (g))/delta) + 4)
+    end
+    if (delta == 0) then
+      h = 0
+      s = 0
+    else
+      s = math.floor((maxcolor - mincolor)/(1-math.abs(2*l -1)))
+    end
+    l = math.floor(l/dimfactor)
+
+    local c, x, m
+    c = (1- math.abs(2*l - 1)) * s
+    x = c * (1-math.abs((h) % 2 - 1))
+    m = l-math.floor(c/2)
+
+    local rprime, gprime, bprime
+
+    if ( h < 1) then
+      rprime = c
+      gprime = x
+      bprime = 0
+    else if (h < 2) then
+      rprime = x
+      gprime = c
+      bprime = 0
+    else if (h < 3) then
+      rprime = 0
+      gprime = c
+      bprime = x
+    else if (h < 4) then
+      rprime = 0
+      gprime = x
+      bprime = c
+    else if (h < 5) then
+      rprime = x
+      gprime = 0
+      bprime = c
+    else if (h < 6) then
+      rprime = c
+      gprime = 0
+      bprime = x
+    end
+
+    g = math.abs(math.floor((gprime + m)))
+    b = math.abs(math.floor((bprime + m)))
+    r = math.abs(math.floor((rprime + m)))
+    print("green is ", g)
+    print("blue is ", b)
   end
   return g,r,b
 end
@@ -138,7 +209,15 @@ local function ontouch()
   end
 
   -- XXX front left: no function assigned, maybe device select or something?
-  -- if bit.isset(down,4) then end
+  if bit.isset(down,4) then
+    dimdisplay()
+    claimfb()
+  end
+
+  if bit.isset(down,5) then
+    -- I could have sworn I had already started this :\
+
+  end
 
   -- draw if we've claimed it!
   if ledfb == touchfb then
