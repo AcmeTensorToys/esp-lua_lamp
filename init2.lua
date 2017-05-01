@@ -44,22 +44,23 @@ ledfb_claimed = 0 -- 0 : unclaimed, set remote immediately
 
 isblackout = false
 dimfactor = 0
+local baselinefb = ws2812.newBuffer(32,3)
+baselinefb:fill(1,1,1)
+local doublefb = ws2812.newBuffer(32,3)
 function dodraw()
   if not isblackout then
     if dimfactor > 0 then
       for i=1, ledfb:size() do
         local g,r,b = ledfb:get(i)
-        -- need to allocate two buffers, reading from one and writing to the other to allow for some pixels only being set once then dimmed into infinity and others being redrawn each frame.
-        for dimindex = 0, dimfactor do
-          g = math.floor((g+1)/2)
-          b = math.floor((b+1)/2)
-          r = math.floor((r+1)/2)
-        end
-        ledfb:set(i, g, r, b)
+        -- dimming, so mix the baseline "all channels on minimum" as 128/256ths
+        -- to act as a rounding factor.  The image in "ledfb" will be mixed in
+        -- as 256/(dimfactor+1) 256ths
+        doublefb:mix(128,baselinefb,256/(dimfactor+1),ledfb)
+        ws2812.write(doublefb)
       end
+    else
+      ws2812.write(ledfb)
     end
-    --print(ledfb)
-    ws2812.write(ledfb)
   end
 end
 function doremotedraw()
