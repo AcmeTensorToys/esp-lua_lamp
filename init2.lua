@@ -43,7 +43,25 @@ ledfb_claimed = 0 -- 0 : unclaimed, set remote immediately
                   -- 2 : claimed locally but remote has changed
 
 isblackout = false
-function dodraw() if not isblackout then ws2812.write(ledfb) end end
+dimfactor = 0
+function dodraw()
+  if not isblackout then
+    if dimfactor > 0 then
+      for i=1, ledfb:size() do
+        local g,r,b = ledfb:get(i)
+        -- need to allocate two buffers, reading from one and writing to the other to allow for some pixels only being set once then dimmed into infinity and others being redrawn each frame.
+        for dimindex = 0, dimfactor do
+          g = math.floor((g+1)/2)
+          b = math.floor((b+1)/2)
+          r = math.floor((r+1)/2)
+        end
+        ledfb:set(i, g, r, b)
+      end
+    end
+    --print(ledfb)
+    ws2812.write(ledfb)
+  end
+end
 function doremotedraw()
   if ledfb_claimed > 1
    then ledfb_claimed = 2

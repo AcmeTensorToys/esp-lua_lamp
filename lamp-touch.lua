@@ -1,4 +1,4 @@
--- globals referenced: isblackout, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
+-- globals referenced: isblackout, dimfactor, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
 --
 -- globals asserted: touchcolor, touchlastfn
 --
@@ -10,7 +10,6 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchfns    = { }
 local touchfnix = 1
-local dimfactor = 0
 
 if touchcolor == nil then touchcolor = 40 end
 if touchlastfn == nil then touchlastfn = "fill" end
@@ -62,18 +61,6 @@ local function touchcolorvec(c)
   if     c < 16 then r = 15 - cm; g = cm; b = 0
   elseif c < 32 then r = 0; g = 15 - cm; b = cm
   else               r = cm; g = 0; b = 15 - cm
-  end
-  if (dimfactor > 0) then
-    print("before green is ", g)
-    print("before blue is ", b)
-
-    for i = 0, dimfactor do
-      g = math.floor((g+1)/2)
-      b = math.floor((b+1)/2)
-      r = math.floor((r+1)/2)
-    end
-    print("green is ", g)
-    print("blue is ", b)
   end
   return g,r,b
 end
@@ -154,7 +141,7 @@ local function ontouch()
     end
   end
 
-  -- XXX front left: no function assigned, maybe device select or something?
+  -- XXX front left: dim the display
   if bit.isset(down,4) then
     dimdisplay()
     claimfb()
