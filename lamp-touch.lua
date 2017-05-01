@@ -147,9 +147,16 @@ local function ontouch()
     claimfb()
   end
 
+  -- XXX left side front button
   if bit.isset(down,5) then
-    -- I could have sworn I had already started this :\
+  end
 
+  -- XXX left side middle button
+  if bit.isset(down, 6) then
+  end
+
+  -- XXX left side back button
+  if bit.isset(down, 7) then
   end
 
   -- draw if we've claimed it!
