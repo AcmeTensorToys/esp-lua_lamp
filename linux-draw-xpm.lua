@@ -78,4 +78,4 @@ function dodraw()
   io.write("\n\n") -- XXX? WTF?
   io.flush()
 end
-doremotedraw = dodraw
+doremotedraw = function() remotetmr:start(); dodraw() end

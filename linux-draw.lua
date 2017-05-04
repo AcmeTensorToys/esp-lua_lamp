@@ -38,28 +38,35 @@ end
 -- how backwards is this!?  We are using tq as faked above for tmr support
 -- since it's not obvious to me how to remove pending events in cqueues.
 tmr = {}
-tmr.ALARM_AUTO = 0
-function tmr.unregister(self)
+tmr.ALARM_SINGLE = 0
+tmr.ALARM_SEMI   = 1
+tmr.ALARM_AUTO   = 2
+function tmr._start(self)
+  if self.fn then self.tqe = tq:queue(self.period,self.fn) end
+end
+function tmr.stop(self)
   if self.tqe then tq:dequeue(self.tqe); self.tqe = nil end
 end
-function tmr.register(self,period,mode,fn)
-  tmr.unregister(self)
-
-  local fnwrap
-  if mode == tmr.ALARM_AUTO then
-    -- persist by re-registering after fire
-    fnwrap = function() tmr.register(self,period,mode,fn); fn() end
-  else
-    fnwrap = fn
-  end
-
-  self.tqe = tq:queue(period,fnwrap)
+function tmr.unregister(self)
+  self.fn = nil
 end
+function tmr.register(self,period,mode,fn)
+  tmr.stop(self)
 
-remotetmr = {}
-remotetmr.tqe = nil
-remotetmr.register = tmr.register
-remotetmr.unregister = tmr.unregister
+  self.period = period
+  if mode == tmr.ALARM_AUTO then
+    self.fn = function() tmr._start(self); fn() end
+  else
+    self.fn = fn
+  end
+end
+function tmr.start(self)
+  tmr.stop(self)
+  tmr._start(self)
+end
+tmr_mt = { __index = tmr }
+
+remotetmr = setmetatable({}, tmr_mt)
 
 remotefb = {}
 
