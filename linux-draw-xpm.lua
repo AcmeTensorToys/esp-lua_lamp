@@ -12,7 +12,7 @@ end
 function remotefb.size(self) return self.length end
 function remotefb.fade(self,factor,out)
   local ix, f
-  if out
+  if not out
    then f = function(c) return string.char(string.byte(c,1) / factor) end
    else f = function(c) return string.char(string.byte(c,1) * factor) end
   end
@@ -34,6 +34,7 @@ function loaddrawfn(name)
 end
 
 local outfn = "/run/user/1000/lamp-purple.xpm"
+local tmpfn = outfn .. ".tmp"
 local drawstr = "abcdefghijklmnopqrstuvwxzy123456"
 local drawstr2 = ""
 local function computedrawstr2()
@@ -57,7 +58,7 @@ local function pixelval(byteval)
 
 end
 function dodraw()
-  local f = io.open(outfn,"w+")
+  local f = io.open(tmpfn,"w+")
   f:write("! XPM2\n23 11 33 1\n") -- header
   f:write("0 c #000000\n")
   local ix = 0, r, c
@@ -66,15 +67,15 @@ function dodraw()
       ix = ix + 1
       f:write(string.format("%s c #%02x%02x%02x\n",
               drawstr:sub(ix,ix),
-              string.byte(remotefb[ix],2)*16, -- r
-              string.byte(remotefb[ix],1)*16, -- g
-              string.byte(remotefb[ix],3)*16  -- b
+              math.min(0xFF,string.byte(remotefb[ix],2)*16), -- r
+              math.min(0xFF,string.byte(remotefb[ix],1)*16), -- g
+              math.min(0xFF,string.byte(remotefb[ix],3)*16)  -- b
            ))
     end
   end
   f:write(drawstr2)
   f:close()
-  -- io.stderr:write("draw\n")
+  os.rename(tmpfn, outfn)
   io.write("\n\n") -- XXX? WTF?
   io.flush()
 end
