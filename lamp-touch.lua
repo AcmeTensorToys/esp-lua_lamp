@@ -10,6 +10,7 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchfns    = { }
 local touchfnix = 1
+local dimonly = false
 
 if touchcolor == nil then touchcolor = 40 end
 if touchlastfn == nil then touchlastfn = "fill" end
@@ -125,7 +126,14 @@ local function ontouch()
     touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 
-  if not isblackout then
+  -- XXX front left: dim the display
+  if bit.isset(down,4) then
+    dimdisplay()
+    -- Don't claim the image, just dim whatever is currently on the screen.
+    dodraw()
+  end
+
+  if not isblackout and not dimonly then
     -- front right buttons: local color wheel
     if bit.isset(down,1) then
       -- go forward quickly or slowly
@@ -154,12 +162,6 @@ local function ontouch()
       claimfb()
     elseif touch_db_fn then tq:dequeue(touch_db_fn); touch_db_fn = nil
     end
-  end
-
-  -- XXX front left: dim the display
-  if bit.isset(down,4) then
-    dimdisplay()
-    claimfb()
   end
 
   -- XXX left side front button
