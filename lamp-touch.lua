@@ -1,4 +1,4 @@
--- globals referenced: isblackout, dimfactor, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
+-- globals referenced: isblackout, dimfactor, isDim, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
 --
 -- globals asserted: touchcolor, touchlastfn
 --
@@ -52,7 +52,16 @@ end
 local function toggleblackout() setblackout(not isblackout) end
 
 local function dimdisplay()
-  dimfactor= dimfactor + 1 % 16
+  if isDim then
+    dimfactor = dimfactor + 1
+  else
+    dimfactor = dimfactor - 1
+  end
+  if dimfactor == 7 then
+    isDim = false
+  elseif dimfactor == 0 then
+    isDim = true
+  end
 end
 
 local function touchcolorvec(c)
@@ -106,7 +115,13 @@ local function ontouch()
 
   -- back right button: display toggle once per touch of button
   if bit.isset(down,0) then
-    if touch_db_blackout == nil then toggleblackout() else tq:dequeue(touch_db_blackout) end
+    if touch_db_blackout == nil then
+      toggleblackout()
+    else
+      print("dequeueing blackout call")
+      tq:dequeue(touch_db_blackout)
+    end
+    print("queueing blackout call")
     touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 

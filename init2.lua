@@ -43,6 +43,7 @@ ledfb_claimed = 0 -- 0 : unclaimed, set remote immediately
                   -- 2 : claimed locally but remote has changed
 
 isblackout = false
+isDim = true
 dimfactor = 0
 local baselinefb = ws2812.newBuffer(32,3)
 baselinefb:fill(1,1,1)
@@ -55,7 +56,7 @@ function dodraw()
         -- dimming, so mix the baseline "all channels on minimum" as 128/256ths
         -- to act as a rounding factor.  The image in "ledfb" will be mixed in
         -- as 256/(dimfactor+1) 256ths
-        doublefb:mix(128,baselinefb,256/(dimfactor+1),ledfb)
+        doublefb:mix(256,baselinefb,256/(dimfactor+1),ledfb)
         ws2812.write(doublefb)
       end
     else
