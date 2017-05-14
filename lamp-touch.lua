@@ -10,7 +10,6 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchfns    = { }
 local touchfnix = 1
-local dimonly = false
 
 if touchcolor == nil then touchcolor = 40 end
 if touchlastfn == nil then touchlastfn = "fill" end
@@ -133,7 +132,7 @@ local function ontouch()
     dodraw()
   end
 
-  if not isblackout and not dimonly then
+  if not isblackout then
     -- front right buttons: local color wheel
     if bit.isset(down,1) then
       -- go forward quickly or slowly
