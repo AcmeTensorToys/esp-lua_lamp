@@ -48,6 +48,7 @@ function tmr.stop(self)
   if self.tqe then tq:dequeue(self.tqe); self.tqe = nil end
 end
 function tmr.unregister(self)
+  self:stop()
   self.fn = nil
 end
 function tmr.register(self,period,mode,fn)
@@ -77,6 +78,7 @@ cqc:wrap(function()
     cq.poll({ pollfd = 0, events = 'r' })
     local line = io.read() -- XXX :(
     if line == nil or line == "" then return end
+	printerr("line: " .. line)
     dofile("examples/lamp/lamp-remote.lua")(line)
   end
 end)
