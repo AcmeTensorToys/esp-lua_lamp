@@ -51,14 +51,11 @@ local doublefb = ws2812.newBuffer(32,3)
 function dodraw()
   if not isblackout then
     if dimfactor > 0 then
-      for i=1, ledfb:size() do
-        local g,r,b = ledfb:get(i)
-        -- dimming, so mix the baseline "all channels on minimum" as 128/256ths
+        -- dimming, so mix the baseline "all channels on minimum" as 255/256ths
         -- to act as a rounding factor.  The image in "ledfb" will be mixed in
         -- as 256/(dimfactor+1) 256ths
-        doublefb:mix(256,baselinefb,256/(dimfactor+1),ledfb)
+        doublefb:mix(255,baselinefb,256/(dimfactor+1),ledfb)
         ws2812.write(doublefb)
-      end
     else
       ws2812.write(ledfb)
     end

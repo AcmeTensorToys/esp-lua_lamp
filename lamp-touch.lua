@@ -125,8 +125,8 @@ local function ontouch()
     touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 
-  -- XXX front left: dim the display
-  if bit.isset(down,4) then
+  -- XXX left side back button: dim the display.
+  if bit.isset(down,7) then
     dimdisplay()
     -- Don't claim the image, just dim whatever is currently on the screen.
     dodraw()
@@ -171,8 +171,8 @@ local function ontouch()
   if bit.isset(down, 6) then
   end
 
-  -- XXX left side back button
-  if bit.isset(down, 7) then
+  -- XXX front left
+  if bit.isset(down, 4) then
   end
 
   -- draw if we've claimed it!
