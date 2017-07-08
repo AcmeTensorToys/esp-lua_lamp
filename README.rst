@@ -93,7 +93,7 @@ expected to *return a function* which takes, in order,
   drawing function returns and will be stopped when appropriate by the rest
   of the system.
 
-* a ws2812 framebuffer object into which all drwaing should happen.  This
+* a ws2812 framebuffer object into which all drawing should happen.  This
   framebuffer should be closed over in any timer callbacks.
 
 * a color parameter, expressed as three arguments 0-255: green, red, blue
