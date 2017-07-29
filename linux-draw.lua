@@ -29,10 +29,10 @@ end
 tq = dofile("tq/tq.lua")(nil)
 tq.__emu_lastcb = 0
 tq.now = function() return cq.monotime() * 1000000 end
-tq.arm = function(self,fn,t)
+tq.arm = function(self,t,et)
   local cbix = tq.__emu_lastcb + 1
   tq.__emu_lastcb = cbix
-  cqc:wrap(function() cq.poll(t/1000) ; if tq.__emu_lastcb == cbix then fn() end end)
+  cqc:wrap(function() cq.poll(t/1000) ; if tq.__emu_lastcb == cbix then tq:fire() end end)
 end
 
 -- how backwards is this!?  We are using tq as faked above for tmr support
