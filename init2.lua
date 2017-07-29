@@ -24,7 +24,7 @@ end
 tcpserv = net.createServer(net.TCP, 120)
 tcpserv:listen(23,function(k)
   local telnetd = dofile "telnetd.lc"
-  telnetd.on["conn"] = function(k) k:send(string.format("%s [NODE-%06X]",mqttUser,node.chipid())) end
+  telnetd.on["conn"] = function(k) k(string.format("%s [NODE-%06X]",mqttUser,node.chipid())) end
   telnetd.server(k)
 end)
 
