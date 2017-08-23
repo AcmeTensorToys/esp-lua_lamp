@@ -1,4 +1,4 @@
-package.loaded["morse"] = dofile("morse/morse.lua")
+package.loaded["morse"] = dofile("morse/morse")
 
 local dit = 500 -- milliseconds
 

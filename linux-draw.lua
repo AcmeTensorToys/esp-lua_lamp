@@ -10,7 +10,7 @@
 cq = require "cqueues"
 local cqs = require "cqueues.signal"
 cqc = cq.new()
-package.loaded["fifo"] = dofile("fifo/fifo.lua") -- ick, but hey, it works!
+package.loaded["fifo"] = require "fifo/fifo"
 
 function printerr(...)
   local s = "", i, v
@@ -26,7 +26,7 @@ end
 -- laying around, and they might accumulate without bound.  So we have a
 -- notion of which callback was registered last and the others turn into
 -- NOPs by comparing the current callback against the value we closed over.
-tq = dofile("tq/tq.lua")(nil)
+tq = require("tq/tq")(nil)
 tq.__emu_lastcb = 0
 tq.now = function() return cq.monotime() * 1000000 end
 tq.arm = function(self,t,et)
@@ -79,7 +79,7 @@ cqc:wrap(function()
     local line = io.read() -- XXX :(
     if line == nil or line == "" then return end
 	printerr("line: " .. line)
-    dofile("examples/lamp/lamp-remote.lua")(line)
+    dofile("lamp-remote.lua")(line)
   end
 end)
 io.stdout:setvbuf("no")

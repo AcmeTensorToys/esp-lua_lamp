@@ -25,7 +25,7 @@ end
 
 local function drawfailsafe(t,fb,g,r,b) fb:fill(0,0,0) end
 function loaddrawfn(name)
-  local f = loadfile (string.format("examples/lamp/draw-%s.lua",name))
+  local f = loadfile (string.format("draw-%s.lua",name))
   local fn = f and f()
   if fn
    then return function(t,fb,g,r,b) fn(t,fb,g,r,b) end
