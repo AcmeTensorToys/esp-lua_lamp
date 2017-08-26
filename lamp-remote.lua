@@ -35,8 +35,8 @@ return function(msg)
       -- on the next tick (for, e.g., delay's use).  This is done on a
       -- callback to prevent deep stacks.
       local m,r,g,b = s:match("^(%w+)%s+(%x+)%s+(%x+)%s+(%x+)%s*$")
-      g = tonumber(g,16); r = tonumber(r,16); b = tonumber(b,16)
       if m then
+        g = tonumber(g,16); r = tonumber(r,16); b = tonumber(b,16)
         fq(function()
           remotetmr:unregister()
           loaddrawfn(m)(remotetmr,remotefb,g,r,b); doremotedraw()
