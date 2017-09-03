@@ -3,8 +3,11 @@ Remote Touch Lamp
 #################
 
 This somewhat sizable project is a re-implementation of
-``http://filimin.com/`` of sorts.  It speaks MQTT and uses a CAP1188 for
+http://filimin.com/ of sorts.  It speaks MQTT and uses a CAP1188 for
 local touch sensing.  Display is via a grid of so-called "NeoPixel" LEDs.
+
+Motivation, pictures, and additional discussion can be found at
+http://www.ietfng.org/nwf/ee/purple-lamp.html
 
 Hardware V1
 ###########
@@ -51,6 +54,22 @@ stack the RGB array atop the ESP8266 and hookup via the Doubler's female
 headers, or do away with the Doubler entirely and hook the male pins on the
 ESP8266, etc.
 
+Revision 1.1
+============
+
+An AND gate (actually, a 7408) was added to gate serial access to the
+WS2812.  On boot, the ESP8266 emits debugging information to its alternate
+serial console, which is also the ws2812 data source.  This results in some
+blindingly bright light when the machine boots or crashes.  The AND gate
+effectively prevents the chip from writing to the ws2812 matrix unless
+another GPIO is pulled high as well.
+
+The WS2812 LED array from AdaFruit allows for one of many pins to be
+selected for the WS2812 input line; as the ESP8266 does not use all of the
+possible I/O lines of the Feather design, a free signal (N/C to the ESP8266
+Feather Huzzah CPU board) was chosen instead and the AND gate's output
+routed back into the stack on this line.
+
 ESP IO
 ######
 
@@ -58,6 +77,8 @@ The various boards are interfaced as follows:
 
 +--------------+----------------------------------------------------------+
 | ESP GPIO Pin | Function                                                 |
++--------------+----------------------------------------------------------+
+| 0            | WS2812 AND-gate input (see above)                        |
 +--------------+----------------------------------------------------------+
 | 2            | WS2812 serial shift out (to LED array input)             |
 +--------------+----------------------------------------------------------+
