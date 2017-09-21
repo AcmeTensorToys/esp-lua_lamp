@@ -19,7 +19,6 @@ function loaddrawfn(name)
   if fn then return fn else return drawfailsafe end
 end
 
-
 -- telnetd overlay
 tcpserv = net.createServer(net.TCP, 120)
 tcpserv:listen(23,function(k)
@@ -79,23 +78,31 @@ nwfnet.onmqtt["lamp"] = function(c,t,m) if t and m and t:find("^lamp/[^/]+/out")
 function lamp_announce(fn,g,r,b) mqc:publish(mqttBcastPfx,string.format("new; draw %s %x %x %x;",fn,r,g,b),1,1) end
 
 -- mqtt setup
-local mqtt_beat_cancel
-local mqtt_reconn_poller
-local function mqtt_reconn()
-  mqtt_reconn_poller = tq:queue(30000,mqtt_reconn)
+local mqtt_reconn_timer
+local function mqtt_reconn(_t)
   mqc:close(); dofile("nwfmqtt.lc").connect(mqc,"nwfmqtt.conf")
 end
+local function mqtt_conn()
+  mqtt_reconn_timer = tmr.create()
+  mqtt_reconn(mqtt_reconn_timer)
+  mqtt_reconn_timer:alarm(30000,tmr.ALARM_AUTO,mqtt_reconn)
+end
+
+local mqtt_beat_cron
 
 -- network callbacks
 nwfnet.onnet["init"] = function(e,c)
   if     e == "mqttdscn" and c == mqc then
-    if mqtt_beat_cancel then mqtt_beat_cancel(); mqtt_beat_cancel = nil end
-    if not mqtt_reconn_poller then mqtt_reconn() end
+    if mqtt_beat_cron then mqtt_beat_cron:unschedule(); mqtt_beat_cron = nil end
+    if not mqtt_reconn_timer then mqtt_conn() end
     remotetmr:unregister()
     loaddrawfn("xx")(remotetmr,remotefb,0,5,0); doremotedraw()
   elseif e == "mqttconn" and c == mqc then
-    if mqtt_reconn_poller then tq:dequeue(mqtt_reconn_poller); mqtt_reconn_poller = nil end
-    if not mqtt_beat_cancel then mqtt_beat_cancel = dofile("nwfmqtt.lc").heartbeat(mqc,mqttHeartTopic,tq,mqttHeartbeat) end
+    if mqtt_reconn_timer then
+      mqtt_reconn_timer:unregister()
+      mqtt_reconn_timer = nil
+    end
+    mqtt_beat_cron = cron.schedule("*/5 * * * *",function(e) mqc:publish(mqttHeartTopic,"beat",1,1) end)
     mqc:publish(mqttHeartTopic,"alive",1,1)
     mqc:subscribe(string.format("lamp/+/out/%s",mqttUser),1)
     dofile("nwfmqtt.lc").suball(mqc,"nwfmqtt.subs")
