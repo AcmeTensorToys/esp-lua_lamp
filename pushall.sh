@@ -12,6 +12,7 @@ dopushcompile lamp-remote.lua
 dopushcompile telnetd-cap.lua
 #dopushtext    conf/nwfmqtt.conf
 #dopushtext    conf/nwfmqtt.subs
+dopushlua     init-early.lua
 dopushcompile init2.lua
 
 for i in draw-*.lua; do

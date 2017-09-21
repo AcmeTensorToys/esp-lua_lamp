@@ -55,10 +55,11 @@ function dodraw()
       -- to act as a rounding factor.  The image in "ledfb" will be mixed in
       -- as 256/(dimfactor+1) 256ths
       doublefb:mix(255,baselinefb,256/(dimfactor+1),ledfb)
-      ws2812.write(doublefb)
+      gpio.write(3,gpio.HIGH) ws2812.write(doublefb)
     else
-      ws2812.write(ledfb)
+      gpio.write(3,gpio.HIGH) ws2812.write(ledfb)
     end
+    gpio.write(3,gpio.LOW)
   end
 end
 function doremotedraw()
