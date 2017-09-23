@@ -37,7 +37,9 @@ local clear0 = function(o) return bit.band(o,0xFE) end
 local function setblackout(nb)
   if nb then
     isblackout = true
+    gpio.write(3,gpio.HIGH)
     ws2812.write(string.char(0):rep(32*3))
+    gpio.write(3,gpio.LOW)
     cap:mr(0x81,function(o) return bit.bor(o,0x03) end) -- breathe
     cap:mr(0x74,set0) -- drive
     cap:mr(0x72,clear0) -- unlink
