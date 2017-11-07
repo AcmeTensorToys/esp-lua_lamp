@@ -18,11 +18,10 @@ if touchlastfn == nil then touchlastfn = "fill" end
 local k,v
 for k,v in pairs(file.list()) do
   local ix, _, meth = k:find("^draw%-(%w+)%.lc$")
-  if ix then
-    touchfns[#touchfns+1] = meth
-    if meth == touchlastfn then touchfnix = #touchfns end
-  end
+  if ix then touchfns[#touchfns+1] = meth end
 end
+table.sort(touchfns)
+for k,v in ipairs(touchfns) do if v == touchlastfn then touchfnix = k end end
 
 local function claimfb()
   if ledfb_claimed == 0 then
