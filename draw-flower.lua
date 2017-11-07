@@ -5,9 +5,12 @@
 -- 24 o o l o f f f o
 --
 
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   fb:fill(0,0,0)
-  local c = string.char(g,r,b)
+  local c = p[1]
+  local g = c:byte(1)
+  local r = c:byte(2)
+  local b = c:byte(3)
   local cdim = string.char(math.floor((g+1)/2),math.floor((r+1)/2),math.floor((b+1)/2))
 
   for i,v in ipairs({17,18,19,20}) do fb:set(v,0xf,0,0) end -- stem (s)

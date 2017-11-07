@@ -7,12 +7,16 @@
 -- 24 o W W W W W W o
 --
 
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   fb:fill(0,0,0)
   -- static base
   local i,v
   for i,v in ipairs({18,23,26,27,28,29,30,31}) do fb:set(v,2,2,1) end -- whiteish (W)
   for i,v in ipairs({10,15,19,20,21,22})       do fb:set(v,1,1,1) end -- dim white (w)
+
+  local g = p[1]:byte(1)
+  local r = p[1]:byte(2)
+  local b = p[1]:byte(3)
 
   local cmax = math.max(r,g,b)
 

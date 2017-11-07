@@ -1,5 +1,8 @@
-return function(t,fb,g,r,b)
-  local c = string.char(g,r,b)
+return function(t,fb,p)
+  local c = p[1]
+  local g = p[1]:byte(1)
+  local r = p[1]:byte(2)
+  local b = p[1]:byte(3)
   local cmax = math.max(r,g,b)
   local i,v
   
@@ -15,7 +18,7 @@ return function(t,fb,g,r,b)
     for i,v in ipairs{...} do fb:set(v,ag,ar,ab) end
   end
 
-  local function drawEq() for i,v in ipairs({3,6}) do fb:set(v,g,r,b) end end
+  local function drawEq() for i,v in ipairs({3,6}) do fb:set(v,c) end end
   local function drawTwinkleEyes() drawbiased(3,6) end
   local ft = { [0] = drawEq, drawEq, drawTwinkleEyes }
   fb:fill(0,0,0)

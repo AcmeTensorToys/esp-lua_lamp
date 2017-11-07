@@ -2,10 +2,10 @@
 -- 0 x 0 - - x - -
 -- 1 0 1 x x - - -
 -- - - - - - x - -
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   fb:fill(0,0,0)
   local ix = 1
-  local c = string.char(g,r,b)
+  local c = p[1]
   fb:set( 2,c) fb:set( 9,c) fb:set(10,c)
   fb:set(11,c) fb:set(14,c) fb:set(18,c) fb:set(20,c)
   fb:set(21,c) fb:set(30,c)

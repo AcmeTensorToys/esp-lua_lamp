@@ -117,8 +117,9 @@ expected to *return a function* which takes, in order,
 * a ws2812 framebuffer object into which all drawing should happen.  This
   framebuffer should be closed over in any timer callbacks.
 
-* a color parameter, expressed as three arguments 0-255: green, red, blue
-  (as per ws2812 byte ordering).
+* A color palette array.  Each entry is a string of three, where the bytes
+  form the green, red, and blue color values (0-255), as per ws2812 byte
+  ordering.  Most drawings will simply use entry 1.
 
 ``lamp-touch.lua`` (see below) knows the naming scheme used by ``init2.lua``
 and so walks the list of files on the system looking for files whose name

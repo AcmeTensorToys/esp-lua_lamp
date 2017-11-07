@@ -13,7 +13,7 @@ remoteqtmrs = {}
 isTouch = false
 pendRemoteMsg = nil
 
-local function drawfailsafe(t,fb,g,r,b) fb:fill(g,r,b) end
+local function drawfailsafe(t,fb,p) fb:fill(p[1]:byte(1),p[1]:byte(2),p[1]:byte(3)) end
 function loaddrawfn(name)
   local f = loadfile (string.format("draw-%s.lc",name))
   local fn = f and f()

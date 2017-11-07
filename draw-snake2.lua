@@ -1,14 +1,18 @@
 -- a more curious snake with occasional red "heart" nearby
 --
+-- Palette: snake, heart
+--
+--
 --    1 2 3 4 5 6 7 8
 -- 00 o o o o o h x h
 -- 08 o o o o o e x o
 -- 16 w w w w o o x o
 -- 24 w w w w x x x o
 --
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   local ix = 2 -- since we start effectively in state 1...
-  local c = string.char(g,r,b)
+  local c = p[1]
+  local h = p[2] or string.char(0,15,0) -- heart defaults red
   local z = string.char(0,0,0)
   local ft = {   -- flatten out
                [1] = function() fb:set(25,c) fb:set(27,c) fb:set(17,z) fb:set(19,z) end
@@ -19,7 +23,7 @@ return function(t,fb,g,r,b)
                  -- look forward
              , [3] = function() fb:set(6,z) fb:set(8,c) end
                  -- heart on (like what we see)
-             , [4] = function() fb:set(14,0,15,0) end
+             , [4] = function() fb:set(14,h) end
                  -- slither 1
              , [5] = function() fb:set(20,c) fb:set(28,z) end
                  -- slither 2

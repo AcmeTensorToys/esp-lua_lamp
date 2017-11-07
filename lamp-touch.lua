@@ -182,7 +182,7 @@ local function ontouch()
   if ledfb == touchfb then
     touchtmr:unregister()
     touchlastfn = touchfns[touchfnix]
-    loaddrawfn(touchlastfn)(touchtmr,touchfb,touchcolorvec(touchcolor)); dodraw()
+    loaddrawfn(touchlastfn)(touchtmr,touchfb,{string.char(touchcolorvec(touchcolor))}); dodraw()
     touchtmr:start()
   end
 end

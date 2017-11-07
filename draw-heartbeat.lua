@@ -1,5 +1,5 @@
-return function(t,fb,g,r,b)
-  local c = string.char(g,r,b)
+return function(t,fb,p)
+  local c = p[1]
   local ft = { [1] = function() fb:set(11,c)                      fb:set(13,c)     end, -- side chambers
                [2] = function() fb:set(11,0,0,0) fb:set(20,c)     fb:set(13,0,0,0) end, -- bottom chamber
                [3] = function()                  fb:set(20,0,0,0)                  end, -- empty

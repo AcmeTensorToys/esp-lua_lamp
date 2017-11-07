@@ -1,6 +1,6 @@
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   fb:fill(0,0,0)
-  local c = string.char(g,r,b)
+  local c = p[1]
   local ft = { [1] = function() fb:set(2,c) fb:set(9,0,0,0) fb:set(10,c) fb:set(17,0,0,0) fb:set(18,c) fb:set(14,c) fb:set(15,0,0,0) fb:set(22,c) fb:set(23,0,0,0) fb:set(26,c) end, --start flapping
               [2] = function() fb:set(2,0,0,0) fb:set(3,c)
 	              fb:set(6,0,0,0) fb:set(27,c) fb:set(5,c)

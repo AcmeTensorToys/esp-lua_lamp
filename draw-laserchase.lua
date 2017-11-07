@@ -1,6 +1,6 @@
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   local ix = 1
-  local c = string.char(g,r,b)
+  local c = p[1]
   fb:fill(0,0,0)
   t:register(50,tmr.ALARM_AUTO,function()
     fb:fade(2); fb:set(ix,c); dodraw()

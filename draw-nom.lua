@@ -1,7 +1,7 @@
 --
-return function(t,fb,g,r,b)
+return function(t,fb,p)
   local ix = 2 -- since we start effectively in state 1...
-  local c = string.char(g,r,b)
+  local c = p[1]
   local z = string.char(0,0,0)
   local ft = {   -- open mouth
                [1] = function() fb:set(16,z) fb:set(24,z) fb:set(9,c) fb:set(17,c) fb:set(2,c) fb:set(26,c) end
