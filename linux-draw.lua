@@ -76,6 +76,18 @@ function tmr.create()
 end
 
 remotetmr = tmr.create()
+remoteqtmrs = {}
+
+function removeremote()
+  local k,v
+
+  -- drop all pending script timers
+  for k,v in pairs(remoteqtmrs) do v:unregister() end
+  remoteqtmrs = {}
+
+  -- and the current remote animation's timer
+  remotetmr:unregister()
+end
 
 remotefb = {}
 

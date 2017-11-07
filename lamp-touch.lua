@@ -1,4 +1,4 @@
--- globals referenced: isblackout, dimfactor, isDim, dodraw, ledfb, ledfb_claimed, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
+-- globals referenced: isblackout, dimfactor, isDim, dodraw, ledfb, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
 --
 -- globals asserted: touchcolor, touchlastfn
 --
@@ -24,11 +24,9 @@ table.sort(touchfns)
 for k,v in ipairs(touchfns) do if v == touchlastfn then touchfnix = k end end
 
 local function claimfb()
-  if ledfb_claimed == 0 then
-    remotetmr:stop()
-    ledfb_claimed = 1
-    ledfb = touchfb
-  end
+  removeremote()
+  isTouch = true
+  ledfb = touchfb
 end
 
 local set0 = function(o) return bit.bor(o,0x01) end
@@ -83,6 +81,8 @@ local clear30 = function(o) return bit.band(o,0xE1) end
 local function ontouchdone()
   gpio.trig(6, "low", ontouch_load) -- unload overlay
 
+  isTouch = false
+
   -- we did something.  Announce it!
   if ledfb == touchfb then
     -- flash the four control LEDs to show the user that settings took
@@ -99,9 +99,11 @@ local function ontouchdone()
   -- leave the ledfb pointing at us; it'll get updated eventually,
   -- unless there was a remote message while we were doing our thing
   -- in which case, display it now
-  if ledfb_claimed == 2
-   then ledfb_claimed = 0; remotetmr:start(); doremotedraw()
-   else ledfb_claimed = 0
+  if pendRemoteMsg ~= nil then
+    touchtmr:unregister()
+    ledfb = remotefb
+    dofile("lamp-remote.lc")(pendRemoteMsg)
+    pendRemoteMsg = nil
   end
 end
 

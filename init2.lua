@@ -1,5 +1,3 @@
-local resntpPeriod = 1800000
-local mqttHeartbeat = 600000
 local mqttUser
 
 -- some exported modules for overlay and REPL use
@@ -11,6 +9,9 @@ mqc, mqttUser = dofile("nwfmqtt.lc").mkclient("nwfmqtt.conf")
 local mqttBcastPfx = string.format("lamp/%s/out",mqttUser)
 local mqttHeartTopic = string.format("lamp/%s/boot",mqttUser)
 cap = require "cap1188"
+remoteqtmrs = {}
+isTouch = false
+pendRemoteMsg = nil
 
 local function drawfailsafe(t,fb,g,r,b) fb:fill(g,r,b) end
 function loaddrawfn(name)
@@ -27,9 +28,6 @@ tcpserv:listen(23,function(k)
   telnetd.server(k)
 end)
 
--- Maybe SNTP sync periodically, if we ever come to care about the time (XXX?)
--- dofile("nwfnet-sntp.lc").loopsntp(tq,resntpPeriod,nil)
-
 -- hardware setup
 ws2812.init(ws2812.MODE_SINGLE)     -- uses GPIO2
 i2c.setup(0,2,1,i2c.SLOW)           -- init i2c as per silk screen (GPIO4, GPIO5)
@@ -37,10 +35,6 @@ i2c.setup(0,2,1,i2c.SLOW)           -- init i2c as per silk screen (GPIO4, GPIO5
 -- and now we get to the lamp stuff
 remotefb = ws2812.newBuffer(32,3)
 ledfb = remotefb -- points at whichever buffer is appropriate to draw
-ledfb_claimed = 0 -- 0 : unclaimed, set remote immediately
-                  -- 1 : claimed locally but remote has not changed
-                  -- 2 : claimed locally but remote has changed
-
 isblackout = false
 isDim = true
 dimfactor = 0
@@ -61,21 +55,38 @@ function dodraw()
     gpio.write(3,gpio.LOW)
   end
 end
-function doremotedraw()
-  if ledfb_claimed > 1
-   then ledfb_claimed = 2
-   else touchtmr:unregister(); ledfb = remotefb; remotetmr:start(); dodraw()
+
+function removeremote()
+  local k,v
+
+  -- drop all pending script timers
+  for k,v in pairs(remoteqtmrs) do v:unregister() end
+  remoteqtmrs = {}
+
+  -- and the current remote animation's timer
+  remotetmr:unregister()
+end
+
+local function remotemsg(m)
+  if isTouch
+   then pendRemoteMsg = m
+   else
+    touchtmr:unregister()
+    ledfb = remotefb
+    removeremote()
+    dofile("lamp-remote.lc")(m)
   end
 end
 
-function leddefault(fb,...) fb:fill(0,0,0); local ix; for ix = 25,32 do fb:set(ix,...) end end
-
 -- MQTT-driven local setting
-mqtt_revert = nil
-nwfnet.onmqtt["lamp"] = function(c,t,m) if t and m and t:find("^lamp/[^/]+/out") then dofile("lamp-remote.lc")(m) end end
+nwfnet.onmqtt["lamp"] = function(c,t,m)
+  if t and m and t:find("^lamp/[^/]+/out") then remotemsg(m) end
+end
 
 -- TODO: messages to specific lamps?  Multiple brokers?
-function lamp_announce(fn,g,r,b) mqc:publish(mqttBcastPfx,string.format("new; draw %s %x %x %x;",fn,r,g,b),1,1) end
+function lamp_announce(fn,g,r,b)
+  mqc:publish(mqttBcastPfx,string.format("draw %s %x %x %x;",fn,r,g,b),1,1)
+end
 
 -- mqtt setup
 local mqtt_reconn_timer
@@ -96,7 +107,7 @@ nwfnet.onnet["init"] = function(e,c)
     if mqtt_beat_cron then mqtt_beat_cron:unschedule(); mqtt_beat_cron = nil end
     if not mqtt_reconn_timer then mqtt_conn() end
     remotetmr:unregister()
-    loaddrawfn("xx")(remotetmr,remotefb,0,5,0); doremotedraw()
+	remotemsg("draw xx 4 0 0 ;")
   elseif e == "mqttconn" and c == mqc then
     if mqtt_reconn_timer then
       mqtt_reconn_timer:unregister()
@@ -106,17 +117,17 @@ nwfnet.onnet["init"] = function(e,c)
     mqc:publish(mqttHeartTopic,"alive",1,1)
     mqc:subscribe(string.format("lamp/+/out/%s",mqttUser),1)
     dofile("nwfmqtt.lc").suball(mqc,"nwfmqtt.subs")
-    leddefault(remotefb,0,16,16); doremotedraw()
+	remotemsg("draw xx 4 0 4 ;")
   elseif e == "wstagoip"              then
     if not mqtt_reconn_poller then mqtt_reconn() end
-    leddefault(remotefb,0,0,4); doremotedraw()
+	remotemsg("draw xx 0 0 4 ;")
   elseif e == "wstaconn"              then
-    leddefault(remotefb,0,4,0); doremotedraw()
+	remotemsg("draw xx 0 4 0 ;")
   end
 end
 
 -- initialize display
-loaddrawfn("xx")(remotetmr,remotefb,0,5,5); dodraw()
+remotemsg("draw xx 4 0 0;")
 
 -- touch overlay loader
 function ontouch_load() dofile("lamp-touch.lc") end
