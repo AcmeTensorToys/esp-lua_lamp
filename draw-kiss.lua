@@ -4,7 +4,7 @@
 -- - - - - - x - -
 return function(t,fb,g,r,b)
   fb:fill(0,0,0)
-  local ix = 0
+  local ix = 1
   local c = string.char(g,r,b)
   fb:set( 2,c) fb:set( 9,c) fb:set(10,c)
   fb:set(11,c) fb:set(14,c) fb:set(18,c) fb:set(20,c)
