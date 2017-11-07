@@ -65,9 +65,17 @@ function tmr.start(self)
   tmr.stop(self)
   tmr._start(self)
 end
+function tmr.alarm(self,period,mode,fn)
+  tmr.stop(self)
+  tmr.register(self,period,mode,fn)
+  tmr.start(self)
+end
 tmr_mt = { __index = tmr }
+function tmr.create()
+  return setmetatable({}, tmr_mt)
+end
 
-remotetmr = setmetatable({}, tmr_mt)
+remotetmr = tmr.create()
 
 remotefb = {}
 
