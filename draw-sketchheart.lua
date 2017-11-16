@@ -2,12 +2,11 @@
 --
 -- Palette: together, left, right
 --
---    1 2 3 4 5 6 7 8    --    1 2 3 4 5 6 7 8   --    1 2 3 4 5 6 7 8
--- 00 o 1 o o o o 1 o    -- 00 o o 2 o o 2 o o   -- 00 o o 3 o 3 o o o
--- 08 1 o o o o o o 1    -- 08 o 2 o o o o 2 o   -- 08 o 3 o 3 o 3 o o
--- 16 o 1 o o o o 1 o    -- 16 o o 2 o o 2 o o   -- 16 o o 3 o 3 o o o
--- 24 o o 1 o o 1 o o    -- 24 o o o 2 2 o o o   -- 24 o o o 3 o o o o
---                                                 (or shifted right one)
+--    1 2 3 4 5 6 7 8
+-- 00 o o 3 o 3 o o o
+-- 08 o 3 o 3 o 3 o o
+-- 16 o o 3 o 3 o o o
+-- 24 o o o 3 o o o o
 
 
 return function(t,fb,p)
