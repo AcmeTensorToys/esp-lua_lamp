@@ -1,9 +1,11 @@
 return function(t,fb,p)
   local c = p[1]
-  local ft = { [1] = function() fb:set(11,c)                      fb:set(13,c)     end, -- side chambers
-               [2] = function() fb:set(11,0,0,0) fb:set(20,c)     fb:set(13,0,0,0) end, -- bottom chamber
-               [3] = function()                  fb:set(20,0,0,0)                  end, -- empty
-               [4] = function()                                                    end  -- stay empty
+  local c2 = p[2] or c
+  local z = string.char(0,0,0)
+  local ft = { [1] = function() fb:set(11,c2)               fb:set(13,c2) end, -- side chambers
+               [2] = function() fb:set(11,z)  fb:set(20,c2) fb:set(13,z)  end, -- bottom chamber
+               [3] = function()               fb:set(20,z)                end, -- empty
+               [4] = function()                                           end  -- stay empty
              }
 
   fb:fill(0,0,0)
