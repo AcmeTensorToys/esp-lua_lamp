@@ -101,6 +101,9 @@ end
 
 local mqtt_beat_cron
 
+local wifitmr = tmr.create()
+wifitmr:register(10000, tmr.ALARM_SEMI, function() dofile("nwfnet-go.lc") end)
+
 -- network callbacks
 nwfnet.onnet["init"] = function(e,c)
   if     e == "mqttdscn" and c == mqc then
@@ -121,8 +124,11 @@ nwfnet.onnet["init"] = function(e,c)
   elseif e == "wstagoip"              then
     if not mqtt_reconn_poller then mqtt_reconn() end
 	remotemsg("draw xx 0 0 4 ;")
+	wifitmr:stop()
   elseif e == "wstaconn"              then
 	remotemsg("draw xx 0 4 0 ;")
+  elseif e == "wstadscn"              then
+	wifitmr:start()
   end
 end
 
@@ -139,3 +145,4 @@ dofile("cap1188-init.lc").init(6,5,ontouch_load)
 -- initialize network
 dofile("nwfnet-diag.lc")(true)
 dofile("nwfnet-go.lc")
+wifitmr:start()
