@@ -98,8 +98,9 @@ cqc:wrap(function()
     cq.poll({ pollfd = 0, events = 'r' })
     local line = io.read() -- XXX :(
     if line == nil or line == "" then return end
-	printerr("line: " .. line)
-    dofile("lamp-remote.lua")(line)
+    printerr("line: " .. line)
+    local from, cmd = line:match("^(%S+)%s+(.*)$")
+    dofile("lamp-remote.lua")(cmd)
   end
 end)
 io.stdout:setvbuf("no")
