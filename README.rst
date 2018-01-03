@@ -192,3 +192,25 @@ Useful commands include:
 * ``file remove FILE`` removes ``FILE``.
 
 * ``diag heap`` will display the number of free heap bytes
+
+NodeMCU modules
+===============
+
+Be sure to build the following modules into the firmware:
+
+* ``bit`` -- for I/O port work inside the touch handler
+* ``cron`` -- framework usage (e.g. reconnection timers)
+* ``crypto`` -- used by the telnet file service for hashing
+* ``encoder`` -- used by the telnet file service for base64 work
+* ``file`` -- used by the telnet file service
+* ``gpio`` -- for the AND gate
+* ``i2c`` -- for I/O by the touch handler
+* ``mDNS`` -- framework usage
+* ``MQTT`` -- yes
+* ``net`` -- yes
+* ``node`` -- yes
+* ``sjson`` -- framework usage
+* ``sntp`` -- framework usage
+* ``timer`` -- yes
+* ``wifi`` -- yes
+* ``ws2812`` -- the display itself
