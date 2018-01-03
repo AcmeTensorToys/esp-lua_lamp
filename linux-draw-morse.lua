@@ -30,5 +30,3 @@ function loaddrawfn(name)
      end)
   end
 end
-
-function doremotedraw() end

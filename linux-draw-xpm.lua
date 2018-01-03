@@ -52,12 +52,12 @@ function remotefb.shift(self,n,m,i,j)
   end
 end
 
-local function drawfailsafe(t,fb,g,r,b) fb:fill(0,0,0) end
+local function drawfailsafe(t,fb,p) fb:fill(0,0,0) end
 function loaddrawfn(name)
   local f = loadfile (string.format("draw-%s.lua",name))
   local fn = f and f()
   if fn
-   then return function(t,fb,g,r,b) fn(t,fb,g,r,b) end
+   then return function(t,fb,p) return fn(t,fb,p) end
    else return drawfailsafe
   end
 end
@@ -108,4 +108,3 @@ function dodraw()
   io.write("\n\n") -- XXX? WTF?
   io.flush()
 end
-doremotedraw = function() remotetmr:start(); dodraw() end

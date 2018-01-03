@@ -70,6 +70,11 @@ function tmr.alarm(self,period,mode,fn)
   tmr.register(self,period,mode,fn)
   tmr.start(self)
 end
+function tmr.interval(self, period)
+  self.period = period
+  if self.tqe == nil then return end -- just update interval
+  self:start() -- otherwise, re-schedule
+end
 tmr_mt = { __index = tmr }
 function tmr.create()
   return setmetatable({}, tmr_mt)
