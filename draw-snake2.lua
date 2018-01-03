@@ -11,8 +11,8 @@
 --
 return function(t,fb,p)
   local ix = 2 -- since we start effectively in state 1...
-  local c = p[1]
-  local h = p[2] or string.char(0,15,0) -- heart defaults red
+  local c, h
+
   local z = string.char(0,0,0)
   local ft = {   -- flatten out
                [1] = function() fb:set(25,c) fb:set(27,c) fb:set(17,z) fb:set(19,z) end
@@ -33,12 +33,22 @@ return function(t,fb,p)
                  -- slither 4
              , [8] = function() fb:set(17,c) fb:set(18,z) fb:set(19,c) fb:set(20,z) fb:set(25,z) fb:set(26,c) fb:set(27,z) fb:set(28,c) end
              }
-  fb:fill(0,0,0)
-  fb:set(25,c) fb:set(26,c) fb:set(27,c) fb:set(28,c) fb:set(29,c) fb:set(30,c)
-  fb:set(23,c) fb:set(15,c) fb:set(7,c) fb:set(8,c)
+
+  local function reinit()
+    c = p[1]
+    h = p[2] or string.char(0,15,0) -- heart defaults red
+
+    fb:fill(0,0,0)
+    fb:set(25,c) fb:set(26,c) fb:set(27,c) fb:set(28,c) fb:set(29,c) fb:set(30,c)
+    fb:set(23,c) fb:set(15,c) fb:set(7,c) fb:set(8,c)
+  end
+  reinit()
+
   t:register(500,tmr.ALARM_AUTO,function()
     ft[ix]()
     ix = (ix == 8 and 1) or ix + 1
     dodraw()
   end)
+
+  return { ['ncolors'] = 2, ['cccb'] = function() reinit(); ix = 4; ft[ix](); dodraw() end }
 end

@@ -13,9 +13,7 @@
 
 return function(t,fb,p)
   local k,v
-  local c = p[1]
-  local c2 = p[2] or c
-  local c3 = p[3] or c
+  local c, c2, c3
   local offset = 0
   local ft = {
     -- animate together
@@ -45,12 +43,25 @@ return function(t,fb,p)
     function() fb:set(11+offset,0,0,0) fb:set(13+offset,0,0,0) fb:set(20+offset,c) end,
     function()                                                 fb:set(20+offset,0,0,0) ; offset = 1 - offset end,
   }
+
+  local function reinit()
+    c = p[1]
+    c2 = p[2] or c
+    c3 = p[3] or c
+  end
+  reinit()
+
   ft[1](); dodraw()
-  local ix = 2
+  local ix = 1
   t:register(350,tmr.ALARM_AUTO,function()
-    ft[ix]()
     ix = (ix == #ft and 1) or ix + 1
+    ft[ix]()
     dodraw()
+    t:interval(350) -- put it back in case cccb has changed it
   end)
+
+  -- In cccb, set ix=5 so that all colors are on screen; artificially
+  -- increase animation delay
+  return { ['ncolors'] = 3, ['cccb'] = function() reinit(); ix = 5; ft[ix]() ; dodraw(); t:interval(800) end }
 
 end

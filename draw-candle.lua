@@ -9,16 +9,22 @@
 
 return function(t,fb,p)
   fb:fill(0,0,0)
-  -- static base
-  local i,v
-  for i,v in ipairs({18,23,26,27,28,29,30,31}) do fb:set(v,2,2,1) end -- whiteish (W)
-  for i,v in ipairs({10,15,19,20,21,22})       do fb:set(v,1,1,1) end -- dim white (w)
+  local g, r, b, cmax
 
-  local g = p[1]:byte(1)
-  local r = p[1]:byte(2)
-  local b = p[1]:byte(3)
+  local function reinit()
+    g = p[1]:byte(1)
+    r = p[1]:byte(2)
+    b = p[1]:byte(3)
+    cmax = math.max(r,g,b)
 
-  local cmax = math.max(r,g,b)
+    -- "static" base
+    local i,v
+    local w = p[2] or string.char(2,2,1)
+    for i,v in ipairs({18,23,26,27,28,29,30,31}) do fb:set(v,w) end -- whiteish (W)
+    local w = p[3] or string.char(1,1,1)
+    for i,v in ipairs({10,15,19,20,21,22})       do fb:set(v,w) end -- dim white (w)
+  end
+  reinit()
 
   -- off channels stay off, on channels stay on, just minimally dim
   local function adjust(val,bias) if val == 0 then return 0 elseif val <= bias then return 1 else return val - bias end end
@@ -41,4 +47,6 @@ return function(t,fb,p)
   local ft = { [0] = draweq, draweq, draweq, drawbb, drawlb, drawrb }
   t:register(125,tmr.ALARM_AUTO,function() ft[math.random(#ft)]() dodraw() end)
   draweq()
+
+  return { ['ncolors'] = 3, ['cccb'] = function() reinit() draweq() dodraw() end }
 end

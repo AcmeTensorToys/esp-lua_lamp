@@ -7,11 +7,17 @@
 
 return function(t,fb,p)
   fb:fill(0,0,0)
-  local c = p[1]
-  local g = c:byte(1)
-  local r = c:byte(2)
-  local b = c:byte(3)
-  local cdim = string.char(math.floor((g+1)/2),math.floor((r+1)/2),math.floor((b+1)/2))
+
+  local c, g, r, b, cdim
+
+  local function reinit()
+    c = p[1]
+    g = c:byte(1)
+    r = c:byte(2)
+    b = c:byte(3)
+    cdim = string.char(math.floor((g+1)/2),math.floor((r+1)/2),math.floor((b+1)/2))
+  end
+  reinit()
 
   for i,v in ipairs({17,18,19,20}) do fb:set(v,0xf,0,0) end -- stem (s)
   for i,v in ipairs({10,27})       do fb:set(v,0x7,0,0) end -- leaf (l)
@@ -47,14 +53,16 @@ return function(t,fb,p)
     end,
   }
 
-  local ix = 1
+  local ix = #ft
   local function cb() 
-	local dly = ft[ix]()
     ix = (ix == #ft and 1) or ix + 1
+	local dly = ft[ix]()
     dodraw()
 	t:register(dly,tmr.ALARM_SINGLE,cb)
     t:start()
   end
 
   cb()
+
+  return { ['ncolors'] = 1, ['cccb'] = function() reinit(); for ixp = 1,ix do ft[ixp]() end; dodraw() end }
 end

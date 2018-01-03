@@ -1,30 +1,47 @@
 return function(t,fb,p)
-  fb:fill(0,0,0)
-  local c = p[1]
-  local ft = { [1] = function() fb:set(2,c) fb:set(9,0,0,0) fb:set(10,c) fb:set(17,0,0,0) fb:set(18,c) fb:set(14,c) fb:set(15,0,0,0) fb:set(22,c) fb:set(23,0,0,0) fb:set(26,c) end, --start flapping
-              [2] = function() fb:set(2,0,0,0) fb:set(3,c)
-	              fb:set(6,0,0,0) fb:set(27,c) fb:set(5,c)
-		      fb:set(26,0,0,0) fb:set(29,c) fb:set(30,0,0,0)
-		      fb:set(10,0,0,0) fb:set(18,0,0,0)
-		      fb:set(14,0,0,0) fb:set(22,0,0,0) end, -- fully collapsed
-	      [3] = function() fb:set(2,c) fb:set(3,0,0,0) fb:set(27,0,0,0)
-	              fb:set(5,0,0,0) fb:set(6,c) fb:set(29,0,0,0) fb:set(10,c)
-		      fb:set(18,c) fb:set(14,c) fb:set(22,c) fb:set(26,c)
-		      fb:set(30,c)
-		      end, -- half expanded
-	      [4] = function() fb:set(9,c) fb:set(10,0,0,0) fb:set(17,c)
-	              fb:set(18,0,0,0) fb:set(14,0,0,0) fb:set(15,c)
-		      fb:set(22,0,0,0) fb:set(23,c) end -- back to the beginning
-              }
+  local c
 
-  fb:set( 2,c) fb:set( 4,c) fb:set( 6,c) fb:set( 9,c)
-  fb:set(11,c) fb:set(12,c) fb:set(13,c) fb:set(15,c)
-  fb:set(17,c) fb:set(19,c) fb:set(20,c) fb:set(21,c)
-  fb:set(23,c) fb:set(26,c) fb:set(28,c) fb:set(30,c)
-  local ix = 1
+  fb:fill(0,0,0)
+  local z = string.char(0,0,0)
+  local ft = {[1] = function() --start flapping
+                       fb:set(2,c)
+                       fb:set(9,z)  fb:set(10,c) fb:set(14,c) fb:set(15,z)
+                       fb:set(17,z) fb:set(18,c)
+                       fb:set(22,c) fb:set(23,z) fb:set(26,c)
+                    end,
+              [2] = function() -- fully collapsed
+                       fb:set(2,z)  fb:set(3,c)  fb:set(5,c)  fb:set(6,z)
+                       fb:set(10,z) fb:set(14,z) fb:set(18,z) fb:set(22,z)
+                       fb:set(26,z) fb:set(27,c) fb:set(29,c) fb:set(30,z)
+                    end,
+              [3] = function() -- half expanded
+                       fb:set(2,c)  fb:set(3,z)  fb:set(5,z)  fb:set(6,c)
+                       fb:set(10,c)
+                       fb:set(14,c) fb:set(18,c) fb:set(22,c)
+                       fb:set(26,c) fb:set(27,z) fb:set(29,z) fb:set(30,c)
+                    end,
+              [4] = function() -- back to the beginning
+                       fb:set(9,c) fb:set(10,z) fb:set(14,z) fb:set(15,c)
+                       fb:set(17,c) fb:set(18,z) fb:set(22,z) fb:set(23,c)
+                    end
+             }
+
+  local function reinit()
+    c = p[1]
+
+    fb:set( 2,c) fb:set( 4,c) fb:set( 6,c)
+    fb:set( 9,c) fb:set(11,c) fb:set(12,c) fb:set(13,c) fb:set(15,c)
+    fb:set(17,c) fb:set(19,c) fb:set(20,c) fb:set(21,c) fb:set(23,c)
+    fb:set(26,c) fb:set(28,c) fb:set(30,c)
+  end
+  reinit()
+
+  local ix = 4
   t:register(500,tmr.ALARM_AUTO, function()
-    ft[ix]()
     ix = (ix == 4 and 1) or ix + 1
+    ft[ix]()
     dodraw()
     end)
- end
+
+  return { ['cccb'] = function() reinit(); for ixp = 1,ix do ft[ixp]() end; dodraw() end }
+end

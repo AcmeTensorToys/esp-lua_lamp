@@ -121,6 +121,19 @@ expected to *return a function* which takes, in order,
   form the green, red, and blue color values (0-255), as per ws2812 byte
   ordering.  Most drawings will simply use entry 1.
 
+These drawing functions should return a table containing the following keys:
+
++-------------+-----------------------------------------------------------+
+| ``ncolors`` | The number of colors taken from the palette, default 1.   |
++-------------+-----------------------------------------------------------+
+| ``cccb``    | A callback function for color palette changes;            |
+|             | if ``nil`` (default), no notifications will be given and  |
+|             | the animation will be restarted on such changes.          |
++-------------+-----------------------------------------------------------+
+
+Returning ``nil`` from the drawing function is equivalent to returning a
+table with all defaults (i.e., 1 color, no notification on changes).
+
 ``lamp-touch.lua`` (see below) knows the naming scheme used by ``init2.lua``
 and so walks the list of files on the system looking for files whose name
 matches the Lua regex ``draw-(%w+).lc`` and builds a table of all such

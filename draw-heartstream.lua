@@ -51,4 +51,6 @@ return function(t,fb,p)
 
     dodraw()
   end)
+
+  return { ['ncolors'] = 2 }
 end

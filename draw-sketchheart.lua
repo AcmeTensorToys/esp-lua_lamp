@@ -11,7 +11,13 @@
 
 return function(t,fb,p)
   local k,v
-  local c = p[1]
+  local c
+
+  local function reinit()
+    c = p[1]
+  end
+  reinit()
+
   local offset = 0
   local ft = {
     -- animate together
@@ -40,11 +46,12 @@ return function(t,fb,p)
     function()                                                 fb:set(20+offset,0,0,0) ; end,
   }
   ft[1](); dodraw()
-  local ix = 2
+  local ix = 1
   t:register(350,tmr.ALARM_AUTO,function()
-    ft[ix]()
     ix = (ix == #ft and 1) or ix + 1
+    ft[ix]()
     dodraw()
   end)
 
+  return { ['cccb'] = function() reinit(); local ixp=1,ix do ft[ixp]() end; dodraw() end }
 end
