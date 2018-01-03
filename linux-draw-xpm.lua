@@ -51,6 +51,7 @@ function remotefb.shift(self,n,m,i,j)
     table.insert(self,i,v)
   end
 end
+remotefb:fill(0,0,0)
 
 local function drawfailsafe(t,fb,p) fb:fill(0,0,0) end
 function loaddrawfn(name)

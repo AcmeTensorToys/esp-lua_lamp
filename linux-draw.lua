@@ -96,16 +96,24 @@ end
 
 remotefb = {}
 
-if arg[1] then dofile(arg[1]) else print("You probably meant to give a filename"); os.exit(1) end
+-- can be overridden by modules we load!
+onStdin = function()
+    local line = io.read() -- XXX :(
+    if line == nil or line == "" then return true end
+    printerr("line: " .. line)
+    local from, cmd = line:match("^(%S+)%s+(.*)$")
+    dofile("lamp-remote.lua")(cmd)
+end
+
+if arg[1]
+ then local f = arg[1]; table.remove(arg,1) ; dofile(f)
+ else print("You probably meant to give a filename"); os.exit(1)
+end
 
 cqc:wrap(function()
   while true do
     cq.poll({ pollfd = 0, events = 'r' })
-    local line = io.read() -- XXX :(
-    if line == nil or line == "" then return end
-    printerr("line: " .. line)
-    local from, cmd = line:match("^(%S+)%s+(.*)$")
-    dofile("lamp-remote.lua")(cmd)
+    if onStdin() then break end
   end
 end)
 io.stdout:setvbuf("no")
