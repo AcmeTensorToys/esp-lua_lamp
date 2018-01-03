@@ -10,6 +10,9 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchfns    = { }
 local touchfnix = 1
+local colors      = { }
+local cccb        = nil
+local ncolors     = 1
 
 if touchcolor == nil then touchcolor = 40 end
 if touchlastfn == nil then touchlastfn = "fill" end
@@ -22,6 +25,10 @@ for k,v in pairs(file.list()) do
 end
 table.sort(touchfns)
 for k,v in ipairs(touchfns) do if v == touchlastfn then touchfnix = k end end
+
+-- ensure that there's *something* in the array; even if we can't load this
+-- from the filesystem we'll hit the failsafe path in loaddrawfn
+if #touchfns == 0 then touchfns[1] = "xx" end
 
 local function claimfb()
   removeremote()
@@ -81,10 +88,8 @@ local clear30 = function(o) return bit.band(o,0xE1) end
 local function ontouchdone()
   gpio.trig(6, "low", ontouch_load) -- unload overlay
 
-  isTouch = false
-
   -- we did something.  Announce it!
-  if ledfb == touchfb then
+  if isTouch then
     -- flash the four control LEDs to show the user that settings took
     cap:mr(0x74,set30) -- drive
     cap:mr(0x72,clear30) -- unlink
@@ -95,6 +100,8 @@ local function ontouchdone()
 
     lamp_announce(touchfns[touchfnix],touchcolorvec(touchcolor))
   end
+
+  isTouch = false
 
   -- leave the ledfb pointing at us; it'll get updated eventually,
   -- unless there was a remote message while we were doing our thing
@@ -110,6 +117,9 @@ end
 -- must not change ledfb to touchfb unless the user interacts with us
 local function ontouch()
   local _, down = cap:rt()
+
+  local didChangeFn    = false
+  local didChangeColor = false
 
   if touch_fini ~= nil then tq:dequeue(touch_fini) end
 
@@ -128,7 +138,7 @@ local function ontouch()
     touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 
-  -- XXX left side back button: dim the display.
+  -- left side back button: dim the display.
   if bit.isset(down,7) then
     dimdisplay()
     -- Don't claim the image, just dim whatever is currently on the screen.
@@ -139,14 +149,23 @@ local function ontouch()
     -- front right buttons: local color wheel
     if bit.isset(down,1) then
       -- go forward quickly or slowly
-      if bit.isset(down,2) then touchcolor = touchcolor + 1 else touchcolor = touchcolor + 2 end
+      if bit.isset(down,2)
+       then touchcolor = touchcolor + 1
+       else touchcolor = touchcolor + 2
+      end
       claimfb()
-    else
+      didChangeColor = true
+    elseif bit.isset(down,2) and bit.isclear(down,3) then
       -- go backward, slowly (unless mode select; see below)
-      if bit.isset(down,2) and bit.isclear(down,3) then touchcolor = touchcolor - 1; claimfb() end
+      touchcolor = touchcolor - 1
+      claimfb()
+      didChangeColor = true
     end
-    if     touchcolor >= 48 then touchcolor = touchcolor - 48
-    elseif touchcolor < 0  then touchcolor = touchcolor + 48
+    if didChangeColor then
+     if     touchcolor >= 48 then touchcolor = touchcolor - 48
+     elseif touchcolor < 0  then touchcolor = touchcolor + 48
+     end
+     colors[1] = string.char(touchcolorvec(touchcolor))
     end
 
     -- front middle: mode select (rate-limited, not exactly debounced)
@@ -161,6 +180,7 @@ local function ontouch()
        if touchfnix <= 0 then touchfnix = #touchfns end
        touch_db_fn = tq:queue(200,onfndebounce)
       end
+      didChangeFn = true
       claimfb()
     elseif touch_db_fn then tq:dequeue(touch_db_fn); touch_db_fn = nil
     end
@@ -179,10 +199,19 @@ local function ontouch()
   end
 
   -- draw if we've claimed it!
-  if ledfb == touchfb then
+  if (ledfb == touchfb) and not didChangeFn and didChangeColor and cccb ~= nil then
+    -- all we did was change the color(s); inform the existing animation
+    cccb()
+  elseif didChangeFn then
+    -- full (re)load
     touchtmr:unregister()
     touchlastfn = touchfns[touchfnix]
-    loaddrawfn(touchlastfn)(touchtmr,touchfb,{string.char(touchcolorvec(touchcolor))}); dodraw()
+
+    local drawinfo = loaddrawfn(touchlastfn)(touchtmr,touchfb,colors)
+    cccb = drawinfo and drawinfo['cccb']
+    ncolors = drawinfo and drawinfo['ncolors'] or 1
+
+    dodraw()
     touchtmr:start()
   end
 end
