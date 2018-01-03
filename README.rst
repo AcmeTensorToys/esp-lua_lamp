@@ -148,7 +148,7 @@ IRQ hook with its own function and unregisters itself (by replacing itself
 with ``init2.lua``'s ``ontouch_load`` function) after a timeout of no
 interaction from the user.  See ``ontouchdone``.
 
-At present, there are four used touch channels:
+At present, there are five used touch channels:
 
 * A "blackout" button, which disables drawing to the display and any other
   user interaction until touched again.  This button may be toggled at most
@@ -162,6 +162,11 @@ At present, there are four used touch channels:
   it on the new surface for some seconds to allow the CAP1188 to
   recalibrate.
 
+* A dim control.  Each press advances the display dimming factor along a
+  triangle wave -- that is, dimmer to minimum brightness, then brighter to
+  maximum brightness, then dimmer again, etc.  At present, there are 7
+  "stops" in each direction.
+
 * Two color-wheel controls.  One advances "quickly", one reverses "slowly"
   and, if both are active, the wheel advances "slowly".
 
@@ -170,9 +175,13 @@ At present, there are four used touch channels:
   is rate-limited, so that holding the button will only slowly advance
   through the space of drawings (see ``touch_db_fn``).  Note that releasing
   the button immediately clears the timeout, unlike blackout above.
+
+  Combining this shape selector with the "reverse" color wheel control will
+  reverse the shape selection as well.
   
   Each separate touch interaction will reload the list for ease of
   development.
+
 
 Notes
 #####
