@@ -202,7 +202,7 @@ local function ontouch()
   if (ledfb == touchfb) and not didChangeFn and didChangeColor and cccb ~= nil then
     -- all we did was change the color(s); inform the existing animation
     cccb()
-  elseif didChangeFn then
+  elseif didChangeFn or didChangeColor then
     -- full (re)load
     touchtmr:unregister()
     touchlastfn = touchfns[touchfnix]
