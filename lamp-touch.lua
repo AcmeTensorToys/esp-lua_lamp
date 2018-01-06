@@ -10,9 +10,9 @@ local touch_db_blackout = nil
 local touch_db_fn = nil
 local touchfns    = { }
 local touchfnix = 1
-local colors      = { }
 local cccb        = nil
 local ncolors     = 1
+-- colors table initialized below, once we have touchcolorvec in scope
 
 if touchcolor == nil then touchcolor = 40 end
 if touchlastfn == nil then touchlastfn = "fill" end
@@ -79,6 +79,8 @@ local function touchcolorvec(c)
   end
   return g,r,b
 end
+
+local colors      = { string.char(touchcolorvec(touchcolor)) }
 
 local function onblackdebounce() touch_db_blackout = nil end
 local function onfndebounce() touch_db_fn = nil end
