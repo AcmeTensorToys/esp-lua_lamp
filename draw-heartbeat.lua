@@ -1,9 +1,21 @@
 return function(t,fb,p)
   local c, c2
 
+  local function drawHeart()
+    fb:set( 3,c)
+    fb:set( 5,c)
+    fb:set(10,c)
+    fb:set(12,c)
+    fb:set(14,c)
+    fb:set(19,c)
+    fb:set(21,c)
+    fb:set(28,c)
+  end
+
   local function reinit()
     c = p[1]
     c2 = p[2] or c
+    drawHeart()
   end
   reinit()
 
@@ -15,11 +27,7 @@ return function(t,fb,p)
              }
 
   fb:fill(0,0,0)
-
-               fb:set( 3,c)              fb:set( 5,c)
-  fb:set(10,c)              fb:set(12,c)              fb:set(14,c)
-               fb:set(19,c)              fb:set(21,c)
-                            fb:set(28,c)
+  drawHeart()
 
   local ix = 4
   t:register(250,tmr.ALARM_AUTO,function()
