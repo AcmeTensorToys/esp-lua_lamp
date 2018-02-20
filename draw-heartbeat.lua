@@ -36,5 +36,5 @@ return function(t,fb,p)
     dodraw()
   end)
 
-  return { ['ncolors'] = 2, ['cccb'] = function() reinit(); local ixp = 1,ix do ft[ixp]() end; dodraw() end }
+  return { ['ncolors'] = 2, ['cccb'] = function() reinit(); local ixp for ixp = 1,ix do ft[ixp]() end; dodraw() end }
 end

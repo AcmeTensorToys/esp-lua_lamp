@@ -54,7 +54,7 @@ return function(t,fb,p)
   }
 
   local ix = #ft
-  local function cb() 
+  local function cb()
     ix = (ix == #ft and 1) or ix + 1
 	local dly = ft[ix]()
     dodraw()
@@ -64,5 +64,5 @@ return function(t,fb,p)
 
   cb()
 
-  return { ['ncolors'] = 1, ['cccb'] = function() reinit(); for ixp = 1,ix do ft[ixp]() end; dodraw() end }
+  return { ['ncolors'] = 1, ['cccb'] = function() reinit();local ixp for ixp = 1,ix do ft[ixp]() end; dodraw() end }
 end

@@ -43,5 +43,5 @@ return function(t,fb,p)
     dodraw()
     end)
 
-  return { ['cccb'] = function() reinit(); for ixp = 1,ix do ft[ixp]() end; dodraw() end }
+  return { ['cccb'] = function() reinit();local ixp for ixp = 1,ix do ft[ixp]() end; dodraw() end }
 end
