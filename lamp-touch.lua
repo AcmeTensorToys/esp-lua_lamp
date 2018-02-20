@@ -135,10 +135,8 @@ local function ontouch()
     if touch_db_blackout == nil then
       toggleblackout()
     else
-      print("dequeueing blackout call")
       tq:dequeue(touch_db_blackout)
     end
-    print("queueing blackout call")
     touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 
@@ -172,14 +170,12 @@ local function ontouch()
      if     touchcolor >= 48 then touchcolor = touchcolor - 48
      elseif touchcolor < 0  then touchcolor = touchcolor + 48
      end
-     print(colors, "colorindex is while changing color", colorindex);
      colors[colorindex] = string.char(touchcolorvec(touchcolor))
      networkcolors[colorindex] = {touchcolorvec(touchcolor)}
     end
 
     -- front middle: mode select (rate-limited, not exactly debounced)
     if bit.isset(down,3) then
-      print("front middle touched", touch_db_fn)
       if touch_db_fn == nil then
        if bit.isset(down,2)
         then touchfnix = touchfnix - 1
@@ -204,13 +200,11 @@ local function ontouch()
 
   -- XXX left side middle button; change colors!
   if bit.isset(down, 6) then
-    print("ncolors is ", ncolors);
     if ncolors and colorindex < ncolors then
       colorindex = colorindex + 1;
     else
       colorindex = 1;
     end
-        print("should increment color", colorindex);
   end
 
   -- XXX front left
@@ -219,22 +213,15 @@ local function ontouch()
 
   -- draw if we've claimed it!
   if (ledfb == touchfb) and not didChangeFn and didChangeColor and cccb ~= nil then
-    print("colors only");
     -- all we did was change the color(s); inform the existing animation
     cccb()
   elseif didChangeFn or didChangeColor then
     -- full (re)load
     touchtmr:unregister()
     touchlastfn = touchfns[touchfnix]
-    print(touchlastfn);
     local drawinfo = loaddrawfn(touchlastfn)(touchtmr,touchfb,colors)
-    print(touchlasstfn, "trying drawinfo", drawinfo);
-    if drawinfo then
-      for k,v in pairs(drawinfo) do print(k,v) end
-    end
     cccb = drawinfo and drawinfo['cccb']
     ncolors = drawinfo and drawinfo['ncolors'] or 1
-    print(ncolors);
 
     dodraw()
     touchtmr:start()

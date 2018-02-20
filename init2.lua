@@ -92,26 +92,19 @@ end
 
 -- TODO: messages to specific lamps?  Multiple brokers?
 function lamp_announce(fn,colors)
-  print("trying to announce ", colors)
   if #colors > 1 then
-    if colors then
-      for k,v in pairs(colors[1]) do print(k,v) end
-    else
-      print("nil colors")
+    local broadcaststring
+    for i=1,#colors do
+      local r,g,b = transformcolors(colors[i]);
+      if (i == 1) then
+        broadcaststring = string.format("draw %s %x %x %x;", fn, r,g,b);
+      else
+        broadcaststring = string.format("color %x %x %x %x; ", i, r, g, b) .. broadcaststring
+      end
     end
-    -- TODO more than 2 colors?
-    local r,g,b = transformcolors(colors[1]);
-    local r2,g2,b2 = transformcolors(colors[2])
-    mqc:publish(mqttBcastPfx,string.format("color 2 %x %x %x; draw %s %x %x %x;",r2,g2,b2,fn,r,g,b),1,1)
+    mqc:publish(mqttBcastPfx,broadcaststring,1,1)
   else
-    print("one color")
-    if colors then
-      for k,v in pairs(colors[1]) do print(k,v) end
-    else
-      print("nil colors")
-    end
     local r,g,b = transformcolors(colors[1])
-    print(r,g,b)
     mqc:publish(mqttBcastPfx,string.format("draw %s %x %x %x;",fn,r,g,b),1,1)
   end
 end
