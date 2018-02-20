@@ -80,7 +80,8 @@ local function touchcolorvec(c)
   return g,r,b
 end
 
-local colors      = { string.char(touchcolorvec(touchcolor)) }
+local colors      = { [1] = string.char(touchcolorvec(touchcolor)) }
+local networkcolors = {[1] = {touchcolorvec(touchcolor)} }
 local colorindex = 1;
 
 local function onblackdebounce() touch_db_blackout = nil end
@@ -101,7 +102,7 @@ local function ontouchdone()
       cap:mr(0x72,set30) -- link
     end)
 
-    lamp_announce(touchfns[touchfnix],touchcolorvec(touchcolor))
+    lamp_announce(touchfns[touchfnix],networkcolors)
   end
 
   isTouch = false
@@ -144,7 +145,8 @@ local function ontouch()
   -- left side back button: reset colors and dimming.
   if bit.isset(down,7) then
     dimfactor = 0;
-    colors = { string.char(touchcolorvec(touchcolor)) }
+    colors = { [1] = string.char(touchcolorvec(touchcolor)) }
+    networkcolors = { [1] = {touchcolorvec(touchcolor)}}
     colorindex = 1;
     -- Don't claim the image, just dim whatever is currently on the screen.
     dodraw()
@@ -170,7 +172,9 @@ local function ontouch()
      if     touchcolor >= 48 then touchcolor = touchcolor - 48
      elseif touchcolor < 0  then touchcolor = touchcolor + 48
      end
+     print(colors, "colorindex is while changing color", colorindex);
      colors[colorindex] = string.char(touchcolorvec(touchcolor))
+     networkcolors[colorindex] = {touchcolorvec(touchcolor)}
     end
 
     -- front middle: mode select (rate-limited, not exactly debounced)
@@ -198,13 +202,15 @@ local function ontouch()
     dodraw()
   end
 
-  -- XXX left side middle button
+  -- XXX left side middle button; change colors!
   if bit.isset(down, 6) then
-    if colorindex < ncolors then
+    print("ncolors is ", ncolors);
+    if ncolors and colorindex < ncolors then
       colorindex = colorindex + 1;
     else
       colorindex = 1;
     end
+        print("should increment color", colorindex);
   end
 
   -- XXX front left
@@ -213,6 +219,7 @@ local function ontouch()
 
   -- draw if we've claimed it!
   if (ledfb == touchfb) and not didChangeFn and didChangeColor and cccb ~= nil then
+    print("colors only");
     -- all we did was change the color(s); inform the existing animation
     cccb()
   elseif didChangeFn or didChangeColor then
@@ -221,9 +228,13 @@ local function ontouch()
     touchlastfn = touchfns[touchfnix]
     print(touchlastfn);
     local drawinfo = loaddrawfn(touchlastfn)(touchtmr,touchfb,colors)
-    print(drawinfo);
+    print(touchlasstfn, "trying drawinfo", drawinfo);
+    if drawinfo then
+      for k,v in pairs(drawinfo) do print(k,v) end
+    end
     cccb = drawinfo and drawinfo['cccb']
     ncolors = drawinfo and drawinfo['ncolors'] or 1
+    print(ncolors);
 
     dodraw()
     touchtmr:start()
