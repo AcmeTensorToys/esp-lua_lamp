@@ -16,8 +16,6 @@ return function(t,fb,p)
   local z = string.char(0,0,0)
   local ft = {   -- flatten out
                [1] = function() fb:set(25,c) fb:set(27,c) fb:set(17,z) fb:set(19,z) end
-                 -- stay that way
-             , [2] = function() end
                  -- look back
              , [2] = function() fb:set(6,c) fb:set(8,z) end
                  -- look forward
