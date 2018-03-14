@@ -42,13 +42,21 @@ function remotefb.shift(self,n,m,i,j)
 
   if m == nil then m = remotefb.SHIFT_LOGICAL end
 
-  local ix
-
-  for ix = 1, n do
-    local v = table.remove(self,j)
-    if m == ws2812.SHIFT_LOGICAL then v = string.char(0,0,0) end
-
-    table.insert(self,i,v)
+  if n == 0 then return
+  elseif n > 0 then
+    local ix
+    for ix = 1, n do
+      local v = table.remove(self,j)
+      if m == ws2812.SHIFT_LOGICAL then v = string.char(0,0,0) end
+      table.insert(self,i,v)
+    end
+  elseif n < 0 then
+    local ix
+    for ix = 1, -n do
+      local v = table.remove(self,i)
+      if m == ws2812.SHIFT_LOGICAL then v = string.char(0,0,0) end
+      table.insert(self,j,v)
+    end
   end
 end
 remotefb:fill(0,0,0)
