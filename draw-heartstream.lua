@@ -1,7 +1,12 @@
 return function(t,fb,p)
-  local c = p[1]
-  local c2 = p[2] or c
+  local c, c2
   local z = string.char(0,0,0)
+
+  local function reinit()
+     c = p[1]
+     c2 = p[2] or c
+  end
+  reinit()
 
   local s = {}
   local b = {}
@@ -52,5 +57,6 @@ return function(t,fb,p)
     dodraw()
   end)
 
-  return { ['ncolors'] = 2 }
+--local hixp for hixp = 1,hix do ht[hixp]() end; local fixp for fixp=1,fix do ft[fixp]() end;
+  return { ['ncolors'] = 2, ['cccb'] = function() reinit();  local fixp for fixp=1,fix do ft[fixp]() end; dodraw() end }
 end

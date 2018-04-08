@@ -80,7 +80,9 @@ local function touchcolorvec(c)
   return g,r,b
 end
 
-local colors      = { string.char(touchcolorvec(touchcolor)) }
+local colors      = { [1] = string.char(touchcolorvec(touchcolor)) }
+local networkcolors = {[1] = {touchcolorvec(touchcolor)} }
+local colorindex = 1;
 
 local function onblackdebounce() touch_db_blackout = nil end
 local function onfndebounce() touch_db_fn = nil end
@@ -100,7 +102,7 @@ local function ontouchdone()
       cap:mr(0x72,set30) -- link
     end)
 
-    lamp_announce(touchfns[touchfnix],touchcolorvec(touchcolor))
+    lamp_announce(touchfns[touchfnix],networkcolors)
   end
 
   isTouch = false
@@ -133,16 +135,17 @@ local function ontouch()
     if touch_db_blackout == nil then
       toggleblackout()
     else
-      print("dequeueing blackout call")
       tq:dequeue(touch_db_blackout)
     end
-    print("queueing blackout call")
     touch_db_blackout = tq:queue(300,onblackdebounce)
   end
 
-  -- left side back button: dim the display.
+  -- left side back button: reset colors and dimming.
   if bit.isset(down,7) then
-    dimdisplay()
+    dimfactor = 0;
+    colors = { [1] = string.char(touchcolorvec(touchcolor)) }
+    networkcolors = { [1] = {touchcolorvec(touchcolor)}}
+    colorindex = 1;
     -- Don't claim the image, just dim whatever is currently on the screen.
     dodraw()
   end
@@ -167,12 +170,12 @@ local function ontouch()
      if     touchcolor >= 48 then touchcolor = touchcolor - 48
      elseif touchcolor < 0  then touchcolor = touchcolor + 48
      end
-     colors[1] = string.char(touchcolorvec(touchcolor))
+     colors[colorindex] = string.char(touchcolorvec(touchcolor))
+     networkcolors[colorindex] = {touchcolorvec(touchcolor)}
     end
 
     -- front middle: mode select (rate-limited, not exactly debounced)
     if bit.isset(down,3) then
-      print("front middle touched", touch_db_fn)
       if touch_db_fn == nil then
        if bit.isset(down,2)
         then touchfnix = touchfnix - 1
@@ -188,12 +191,20 @@ local function ontouch()
     end
   end
 
-  -- XXX left side front button
+  -- XXX left side front button, dim the display
   if bit.isset(down,5) then
+    dimdisplay()
+    -- Don't claim the image, just dim whatever is currently on the screen.
+    dodraw()
   end
 
-  -- XXX left side middle button
+  -- XXX left side middle button; change colors!
   if bit.isset(down, 6) then
+    if ncolors and colorindex < ncolors then
+      colorindex = colorindex + 1;
+    else
+      colorindex = 1;
+    end
   end
 
   -- XXX front left
@@ -208,7 +219,6 @@ local function ontouch()
     -- full (re)load
     touchtmr:unregister()
     touchlastfn = touchfns[touchfnix]
-
     local drawinfo = loaddrawfn(touchlastfn)(touchtmr,touchfb,colors)
     cccb = drawinfo and drawinfo['cccb']
     ncolors = drawinfo and drawinfo['ncolors'] or 1

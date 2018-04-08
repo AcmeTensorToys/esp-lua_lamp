@@ -83,9 +83,30 @@ nwfnet.onmqtt["lamp"] = function(c,t,m)
   if t and m and t:find("^lamp/[^/]+/out") then remotemsg(m) end
 end
 
+function transformcolors(color)
+  local g = color[1]
+  local r = color[2]
+  local b = color[3]
+  return r,g,b
+end
+
 -- TODO: messages to specific lamps?  Multiple brokers?
-function lamp_announce(fn,g,r,b)
-  mqc:publish(mqttBcastPfx,string.format("draw %s %x %x %x;",fn,r,g,b),1,1)
+function lamp_announce(fn,colors)
+  if #colors > 1 then
+    local broadcaststring
+    for i=1,#colors do
+      local r,g,b = transformcolors(colors[i]);
+      if (i == 1) then
+        broadcaststring = string.format("draw %s %x %x %x;", fn, r,g,b);
+      else
+        broadcaststring = string.format("color %x %x %x %x; ", i, r, g, b) .. broadcaststring
+      end
+    end
+    mqc:publish(mqttBcastPfx,broadcaststring,1,1)
+  else
+    local r,g,b = transformcolors(colors[1])
+    mqc:publish(mqttBcastPfx,string.format("draw %s %x %x %x;",fn,r,g,b),1,1)
+  end
 end
 
 -- mqtt setup

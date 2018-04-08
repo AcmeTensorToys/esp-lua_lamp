@@ -1,7 +1,13 @@
 --
 return function(t,fb,p)
   local ix = 2 -- since we start effectively in state 1...
-  local c = p[1]
+  local c
+
+  local function reinit()
+    c = p[1]
+  end
+  reinit()
+
   local z = string.char(0,0,0)
   local ft = {   -- open mouth
                [1] = function() fb:set(16,z) fb:set(24,z) fb:set(9,c) fb:set(17,c) fb:set(2,c) fb:set(26,c) end
@@ -36,4 +42,5 @@ return function(t,fb,p)
     ix = (ix == 16 and 1) or ix + 1
     dodraw()
   end)
+    return {['cccb'] = function() reinit(); local ixp for ixp=1,ix do ft[ixp]() end; dodraw() end }
 end
