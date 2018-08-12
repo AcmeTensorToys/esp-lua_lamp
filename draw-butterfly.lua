@@ -1,5 +1,5 @@
 return function(t,fb,p)
-  local c
+  local c, ch
 
   fb:fill(0,0,0)
   local z = string.char(0,0,0)
@@ -28,10 +28,11 @@ return function(t,fb,p)
 
   local function reinit()
     c = p[1]
+    ch = p[2] or c
 
     fb:set( 2,c) fb:set( 4,c) fb:set( 6,c)
-    fb:set( 9,c) fb:set(11,c) fb:set(12,c) fb:set(13,c) fb:set(15,c)
-    fb:set(17,c) fb:set(19,c) fb:set(20,c) fb:set(21,c) fb:set(23,c)
+    fb:set( 9,c) fb:set(11,c) fb:set(12,ch) fb:set(13,c) fb:set(15,c)
+    fb:set(17,c) fb:set(19,c) fb:set(20,c)  fb:set(21,c) fb:set(23,c)
     fb:set(26,c) fb:set(28,c) fb:set(30,c)
   end
   reinit()
