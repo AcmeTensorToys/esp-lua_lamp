@@ -113,7 +113,7 @@ local function ontouchdone()
   if pendRemoteMsg ~= nil then
     touchtmr:unregister()
     ledfb = remotefb
-    dofile("lamp-remote.lc")(pendRemoteMsg)
+    OVL["lamp-remote"]()(pendRemoteMsg)
     pendRemoteMsg = nil
   end
 end

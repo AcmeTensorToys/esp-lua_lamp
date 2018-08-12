@@ -4,9 +4,16 @@ set -e -u
 
 . ./core/host/pushcommon.sh
 
-dopushcompile core/net/nwfmqtt.lua
-dopushcompile core/cap1188/cap1188.lua
-dopushcompile core/cap1188/cap1188-init.lua
+if [ -z ${LUACROSS:-} ] ; then
+  . ./core/host/pushinit.sh
+  dopushcompile core/net/nwfmqtt.lua
+  dopushcompile core/cap1188/cap1188.lua
+  dopushcompile core/cap1188/cap1188-init.lua
+else
+  ./mklfs.sh
+  dopushtext _lfs_build/luac.out
+fi
+
 dopushcompile lamp-touch.lua
 dopushcompile lamp-remote.lua
 dopushcompile telnetd-cap.lua

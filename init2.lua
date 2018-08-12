@@ -3,9 +3,9 @@ local mqttUser
 -- some exported modules for overlay and REPL use
 remotetmr = tmr.create()
 touchtmr = tmr.create()
-tq = (dofile "tq.lc")(tmr.create())
+tq = OVL.tq()(tmr.create())
 nwfnet = require "nwfnet"
-mqc, mqttUser = dofile("nwfmqtt.lc").mkclient("nwfmqtt.conf")
+mqc, mqttUser = OVL.nwfmqtt().mkclient("nwfmqtt.conf")
 local mqttBcastPfx = string.format("lamp/%s/out",mqttUser)
 local mqttHeartTopic = string.format("lamp/%s/boot",mqttUser)
 cap = require "cap1188"
@@ -15,7 +15,7 @@ pendRemoteMsg = nil
 
 local function drawfailsafe(t,fb,p) fb:fill(p[1]:byte(1),p[1]:byte(2),p[1]:byte(3)) end
 function loaddrawfn(name)
-  local f = loadfile (string.format("draw-%s.lc",name))
+  local f = OVL[string.format("draw-%s",name)]
   local fn = f and f()
   if fn then return fn else return drawfailsafe end
 end
@@ -23,7 +23,7 @@ end
 -- telnetd overlay
 tcpserv = net.createServer(net.TCP, 120)
 tcpserv:listen(23,function(k)
-  local telnetd = dofile "telnetd.lc"
+  local telnetd = OVL.telnetd()
   telnetd.on["conn"] = function(k) k(string.format("%s [NODE-%06X]",mqttUser,node.chipid())) end
   telnetd.server(k)
 end)
@@ -74,7 +74,7 @@ local function remotemsg(m)
     touchtmr:unregister()
     ledfb = remotefb
     removeremote()
-    dofile("lamp-remote.lc")(m)
+    OVL["lamp-remote"](m)
   end
 end
 
@@ -112,7 +112,7 @@ end
 -- mqtt setup
 local mqtt_reconn_timer
 local function mqtt_reconn(_t)
-  mqc:close(); dofile("nwfmqtt.lc").connect(mqc,"nwfmqtt.conf")
+  mqc:close(); OVL.nwfmqtt().connect(mqc,"nwfmqtt.conf")
 end
 local function mqtt_conn()
   mqtt_reconn_timer = tmr.create()
@@ -123,7 +123,7 @@ end
 local mqtt_beat_cron
 
 local wifitmr = tmr.create()
-wifitmr:register(10000, tmr.ALARM_SEMI, function() dofile("nwfnet-go.lc") end)
+wifitmr:register(10000, tmr.ALARM_SEMI, function() OVL["nwfnet-go"]() end)
 
 -- network callbacks
 nwfnet.onnet["init"] = function(e,c)
@@ -140,7 +140,7 @@ nwfnet.onnet["init"] = function(e,c)
     mqtt_beat_cron = cron.schedule("*/5 * * * *",function(e) mqc:publish(mqttHeartTopic,"beat",1,1) end)
     mqc:publish(mqttHeartTopic,"alive",1,1)
     mqc:subscribe(string.format("lamp/+/out/%s",mqttUser),1)
-    dofile("nwfmqtt.lc").suball(mqc,"nwfmqtt.subs")
+    OVL.nwfmqtt().suball(mqc,"nwfmqtt.subs")
 	remotemsg("draw xx 4 0 4 ;")
   elseif e == "wstagoip"              then
     if not mqtt_reconn_poller then mqtt_reconn() end
@@ -157,13 +157,13 @@ end
 remotemsg("draw xx 4 0 0;")
 
 -- touch overlay loader
-function ontouch_load() dofile("lamp-touch.lc") end
+function ontouch_load() OVL["lamp-touch"]() end
 
 -- pin 6 (GPIO12) is cap sensor IRQ (active low)
 -- pin 5 (GPIO14) is cap sensor reset (active low)
-dofile("cap1188-init.lc").init(6,5,ontouch_load)
+OVL["cap1188-init"]().init(6,5,ontouch_load)
 
 -- initialize network
-dofile("nwfnet-diag.lc")(true)
-dofile("nwfnet-go.lc")
+OVL["nwfnet-diag"]()(true)
+OVL["nwfnet-go"]()
 wifitmr:start()
