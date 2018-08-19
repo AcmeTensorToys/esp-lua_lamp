@@ -42,6 +42,7 @@ function love.run()
     local imgd = framechan:demand(1)
     if imgd then
       local img = love.graphics.newImage(imgd)
+      img:setFilter('nearest')
       love.graphics.clear(love.graphics.getBackgroundColor())
       love.graphics.draw(img, 0, 0, 0, 4, 4)
     end
