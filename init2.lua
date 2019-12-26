@@ -6,6 +6,9 @@ touchtmr = tmr.create()
 tq = OVL.tq()(tmr.create())
 nwfnet = require "nwfnet"
 mqc, mqttUser = OVL.nwfmqtt().mkclient("nwfmqtt.conf")
+if mqttUser == nil then
+  print("YOU FORGOT YOUR MQTT CONFIG FILE!")
+end
 local mqttBcastPfx = string.format("lamp/%s/out",mqttUser)
 local mqttHeartTopic = string.format("lamp/%s/boot",mqttUser)
 cap = require "cap1188"
@@ -83,7 +86,7 @@ nwfnet.onmqtt["lamp"] = function(c,t,m)
   if t and m and t:find("^lamp/[^/]+/out") then remotemsg(m) end
 end
 
-function transformcolors(color)
+local function transformcolors(color)
   local g = color[1]
   local r = color[2]
   local b = color[3]
@@ -131,7 +134,7 @@ nwfnet.onnet["init"] = function(e,c)
     if mqtt_beat_cron then mqtt_beat_cron:unschedule(); mqtt_beat_cron = nil end
     if not mqtt_reconn_timer then mqtt_conn() end
     remotetmr:unregister()
-	remotemsg("draw xx 4 0 0 ;")
+    remotemsg("draw xx 4 0 0 ;")
   elseif e == "mqttconn" and c == mqc then
     if mqtt_reconn_timer then
       mqtt_reconn_timer:unregister()
@@ -141,15 +144,15 @@ nwfnet.onnet["init"] = function(e,c)
     mqc:publish(mqttHeartTopic,"alive",1,1)
     mqc:subscribe(string.format("lamp/+/out/%s",mqttUser),1)
     OVL.nwfmqtt().suball(mqc,"nwfmqtt.subs")
-	remotemsg("draw xx 4 0 4 ;")
+    remotemsg("draw xx 4 0 4 ;")
   elseif e == "wstagoip"              then
     if not mqtt_reconn_poller then mqtt_reconn() end
-	remotemsg("draw xx 0 0 4 ;")
-	wifitmr:stop()
+    remotemsg("draw xx 0 0 4 ;")
+    wifitmr:stop()
   elseif e == "wstaconn"              then
-	remotemsg("draw xx 0 4 0 ;")
+    remotemsg("draw xx 0 4 0 ;")
   elseif e == "wstadscn"              then
-	wifitmr:start()
+    wifitmr:start()
   end
 end
 
