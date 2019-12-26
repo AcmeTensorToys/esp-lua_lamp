@@ -6,13 +6,21 @@ SOURCES=(
   lamp-lfs-strings.lua
   core/cap1188/cap1188.lua
   core/cap1188/cap1188-init.lua
-  core/fifo/fifo.lua
-  core/net/{fifosock,nwfmqtt,nwfnet*}.lua
+  core/firm/lua_modules/fifo/fifo{,sock}.lua
+  core/net/{nwfmqtt,nwfnet*}.lua
   core/telnetd/telnetd{,-{diag,file}}.lua
   core/tq/tq.lua
   core/util/compileall.lua
   core/util/diag.lua
   core/util/lfs-strings.lua
+
+  init2.lua
+  init-early.lua
+  lamp-remote.lua
+  lamp-touch.lua
+  telnetd-cap.lua
+
+  draw-*.lua
 )
 
 rm -rf _lfs_build

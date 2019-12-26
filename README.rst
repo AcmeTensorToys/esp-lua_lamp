@@ -236,3 +236,33 @@ Be sure to build the following modules into the firmware:
 * ``timer`` -- yes
 * ``wifi`` -- yes
 * ``ws2812`` -- the display itself
+
+Rebuilding the Firmware
+=======================
+
+NodeMCU offers many ways to program the firmware, but the simplest way, the
+most "with the grain", if you will, is to generate three files:
+
+* The base NodeMCU firmware, which contains the above modules.
+
+* The LFS image, which will contain most of nwf's "core" Lua modules.  See
+  ``mklfs.sh``
+
+* The SPIFFS image, containing the lamp's lua, drawings, and
+  configuration data.  See ``mkspiffs.sh``
+
+The lamp lua is kept in SPIFFS nominally so that it's easy to tinker without
+requiring a full reprogram.  In practice this only sort of works.
+
+Run the various build scripts and then program the board, for example::
+
+    ./core/firm/tools/toolchains/esptool.py write_flash \
+     --flash_size 4MB --flash_mode dio --verify \
+     0x0      ./core/firm/bin/nodemcu_integer_lamp.bin \
+     0x3fc000 ./core/firm/sdk/esp_iot_sdk_v3.0-e4434aa/bin/esp_init_data_default_v05.bin
+
+    ./core/firm/tools/nodemcu-partition.py \
+     --flash_size 4MB \
+     --lfs_size 131072 --lfs_file _lfs_build/luac.out \
+     --spiffs_file spiffs.img
+
