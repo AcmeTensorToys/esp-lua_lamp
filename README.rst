@@ -57,18 +57,21 @@ ESP8266, etc.
 Revision 1.1
 ============
 
-An AND gate (actually, a 7408) was added to gate serial access to the
-WS2812.  On boot, the ESP8266 emits debugging information to its alternate
-serial console, which is also the ws2812 data source.  This results in some
-blindingly bright light when the machine boots or crashes.  The AND gate
-effectively prevents the chip from writing to the ws2812 matrix unless
-another GPIO is pulled high as well.
+An AND gate (actually, a 7408) was added to gate serial access to the WS2812.
+On boot, the ESP8266 emits debugging information to its alternate serial
+console, which is also the ws2812 data source (ESP GPIO 2).  This results in
+some blindingly bright light when the machine boots or crashes.  The AND gate
+effectively prevents the chip from writing to the ws2812 matrix unless another
+GPIO (specifically, ESP GPIO 0) is pulled high as well.
 
 The WS2812 LED array from AdaFruit allows for one of many pins to be
 selected for the WS2812 input line; as the ESP8266 does not use all of the
 possible I/O lines of the Feather design, a free signal (N/C to the ESP8266
 Feather Huzzah CPU board) was chosen instead and the AND gate's output
-routed back into the stack on this line.
+routed back into the stack on this line.  We used the Feather pin immediately
+below ADC; that is, the 6th pin from RST to convey this gated signal; on the
+Feather NeoPixel board, this is selected by the jumper that sits below and
+between the "e" and "a" in the big "feather" silkscreen.
 
 ESP IO
 ######
@@ -78,7 +81,7 @@ The various boards are interfaced as follows:
 +--------------+----------------------------------------------------------+
 | ESP GPIO Pin | Function                                                 |
 +--------------+----------------------------------------------------------+
-| 0            | WS2812 AND-gate input (see above)                        |
+| 0            | WS2812 AND-gate input (see Revision 1.1, above)          |
 +--------------+----------------------------------------------------------+
 | 2            | WS2812 serial shift out (to LED array input)             |
 +--------------+----------------------------------------------------------+
