@@ -77,7 +77,7 @@ local function remotemsg(m)
     touchtmr:unregister()
     ledfb = remotefb
     removeremote()
-    OVL["lamp-remote"](m)
+    OVL["lamp-remote"]()(m)
   end
 end
 
