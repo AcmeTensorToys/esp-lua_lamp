@@ -95,21 +95,13 @@ end
 
 -- TODO: messages to specific lamps?  Multiple brokers?
 function lamp_announce(fn,colors)
-  if #colors > 1 then
-    local broadcaststring
-    for i=1,#colors do
-      local r,g,b = transformcolors(colors[i]);
-      if (i == 1) then
-        broadcaststring = string.format("draw %s %x %x %x;", fn, r,g,b);
-      else
-        broadcaststring = string.format("color %x %x %x %x; ", i, r, g, b) .. broadcaststring
-      end
-    end
-    mqc:publish(mqttBcastPfx,broadcaststring,1,1)
-  else
-    local r,g,b = transformcolors(colors[1])
-    mqc:publish(mqttBcastPfx,string.format("draw %s %x %x %x;",fn,r,g,b),1,1)
+  local ct = {}
+  local i
+  for i=2,#colors do
+    ct[#ct+1] = string.format("color %x %x %x %x; ", i, transformcolors(colors[i]))
   end
+  ct[#ct+1] = string.format("draw %s %x %x %x;", fn, transformcolors(colors[1]))
+  mqc:publish(mqttBcastPfx, table.concat(ct),1,1)
 end
 
 -- mqtt setup
