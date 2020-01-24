@@ -3,6 +3,9 @@
 -- globals asserted: touchcolor, touchlastfn
 --
 -- assumptions: gpio.trig(6) is the right thing to do for touch IRQs
+--
+-- XXX this is a steaming pile; we should be taking and manipulating a state object
+-- and should speak with the outside world via callbacks rather than holographically like this
 
 local touchfb = ws2812.newBuffer(32,3)
 local touch_fini = nil
@@ -23,6 +26,11 @@ for k,v in pairs(file.list()) do
   local ix, _, meth = k:find("^draw%-(%w+)%.lc$")
   if ix then touchfns[#touchfns+1] = meth end
 end
+local ut, fa, ma, sz, t = node.flashindex()
+if t then for k,v in ipairs(t) do
+  local ix, _, meth = k:find("^draw%-(%w+)$")
+  if ix then touchfns[#touchfns+1] = meth end
+end end
 table.sort(touchfns)
 for k,v in ipairs(touchfns) do if v == touchlastfn then touchfnix = k end end
 
