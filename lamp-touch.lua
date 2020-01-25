@@ -28,7 +28,7 @@ for k,v in pairs(file.list()) do
 end
 local ut, fa, ma, sz, t = node.flashindex()
 if t then for k,v in ipairs(t) do
-  local ix, _, meth = k:find("^draw%-(%w+)$")
+  local ix, _, meth = v:find("^draw%-(%w+)$")
   if ix then touchfns[#touchfns+1] = meth end
 end end
 table.sort(touchfns)
