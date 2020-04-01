@@ -4,7 +4,7 @@ ltmr = require "love.timer"
 lthr = require "love.thread"
 
 imgd = limg.newImageData(8,4)
-netchan = lthr.getChannel ( "netc" )
+drawchan = lthr.getChannel ( "drawc" )
 framechan = lthr.getChannel ( "framec" )
 
 -- emulate enough framebuffer functionality, backed by a Lua array <<<
@@ -174,7 +174,7 @@ end
 -- >>>
 
 while true do
-  local line = netchan:demand(snooze)
+  local line = drawchan:demand(snooze)
 
   if line then
     local from, cmd = line:match("^(%S+)%s+(.*)$")

@@ -7,4 +7,4 @@ netchan = lthr.getChannel ( "netc" )
 for line in io.lines() do
   netchan:push(line)
 end
-lev.push("quit")
+lev.quit(0)
