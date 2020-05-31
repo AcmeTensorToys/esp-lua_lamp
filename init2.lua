@@ -35,6 +35,8 @@ end)
 ws2812.init(ws2812.MODE_SINGLE)     -- uses GPIO2
 i2c.setup(0,2,1,i2c.SLOW)           -- init i2c as per silk screen (GPIO4, GPIO5)
 
+local inhtmr = tmr.create()
+
 -- and now we get to the lamp stuff
 remotefb = ws2812.newBuffer(32,3)
 ledfb = remotefb -- points at whichever buffer is appropriate to draw
@@ -60,7 +62,11 @@ function dodraw()
     else
       gpio.write(3,gpio.HIGH) ws2812.write(ledfb)
     end
-    gpio.write(3,gpio.LOW)
+    -- Kick the inhibit timer to turn off the AND gate in 2 msec.  That should
+    -- be ample time to drain the serial UART.  If we get here again, we'll end
+    -- up resetting the timer's firing time, making this something like a
+    -- watchdog.  Hopefully we won't crash in the interim.
+    inhtmr:alarm(2,tmr.ALARM_SINGLE,function() gpio.write(3,gpio.LOW) end)
   end
 end
 
