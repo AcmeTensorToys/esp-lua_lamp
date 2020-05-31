@@ -81,17 +81,22 @@ function loaddrawfn(name)
   end
 end
 
+local function nonlinear(val)
+  if     val == 0    then return 0              -- 0 |-> 0
+  elseif val  < 0x10 then return 0x30 + val*13  -- [1, F] |-> [61, 243]
+  else                    return 0xFF           -- ... |-> 255
+  end
+end
+
 -- dump the ws2812 array into a LOVE image and push it into a channel
 function dodraw()
   local ix = 0, r, c
   for r = 0,3 do
     for c = 0,7 do
       ix = ix + 1 
-      imgd:setPixel(c, r,
-        math.min(0xFF,string.byte(remotefb[ix],2)*16)/256,
-        math.min(0xFF,string.byte(remotefb[ix],1)*16)/256,
-        math.min(0xFF,string.byte(remotefb[ix],3)*16)/256
-      )
+      imgd:setPixel(c, r, nonlinear(string.byte(remotefb[ix],2))/255,
+                          nonlinear(string.byte(remotefb[ix],1))/255,
+                          nonlinear(string.byte(remotefb[ix],3))/255)
     end
   end
 
