@@ -47,10 +47,15 @@ local doublefb = ws2812.newBuffer(32,3)
 function dodraw()
   if not isblackout then
     if dimfactor > 0 then
-      -- dimming, so mix the baseline "all channels on minimum" as 255/256ths
-      -- to act as a rounding factor.  The image in "ledfb" will be mixed in
-      -- as 256/(dimfactor+1) 256ths
-      doublefb:mix(255,baselinefb,256/(dimfactor+1),ledfb)
+      -- dimming, so mix the baseline "all channels on minimum" as 127/256ths
+      -- to control rounding (see below).  The image in "ledfb" will be mixed
+      -- in as 256/(dimfactor+1) 256ths.
+      --
+      -- As of nodemcu bd0549ac4aca3455d161bc81b05459d396061854, :mix() itself
+      -- rounds by adding 128/256 to the input and then truncating the bottom 8
+      -- bits after summation, so adding 127 more means that we now round up
+      -- (i.e., by ceil), so an active channel will remain active.
+      doublefb:mix(127,baselinefb,256/(dimfactor+1),ledfb)
       gpio.write(3,gpio.HIGH) ws2812.write(doublefb)
     else
       gpio.write(3,gpio.HIGH) ws2812.write(ledfb)
