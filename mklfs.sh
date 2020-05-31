@@ -32,4 +32,11 @@ mkdir _lfs_build
 # done
 cp ${SOURCES[@]} _lfs_build/
 
-(cd _lfs_build; $LUACROSS -f *.lua)
+if [ -z "${LUACROSS-}" ]; then
+  OZF=lamplfs.zip
+  (cd _lfs_build; zip ${OZF} *.lua)
+  echo "Please send _lfs_build/${OZF} to https://blog.ellisons.org.uk/article/nodemcu/a-lua-cross-compile-web-service/"
+else
+  echo "Compiling image locally..."
+  (cd _lfs_build; $LUACROSS -f *.lua)
+fi
