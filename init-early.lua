@@ -6,6 +6,7 @@ local fb = ws2812.newBuffer(32,3)
 fb:fill(0,0,0)
 gpio.write(3,gpio.HIGH)
 ws2812.write(fb)
+tmr.delay(350)
 gpio.write(3,gpio.LOW)
 
 -- Do we have a new LFS blob?  If so, install it.

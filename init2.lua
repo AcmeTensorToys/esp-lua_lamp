@@ -35,8 +35,6 @@ end)
 ws2812.init(ws2812.MODE_SINGLE)     -- uses GPIO2
 i2c.setup(0,2,1,i2c.SLOW)           -- init i2c as per silk screen (GPIO4, GPIO5)
 
-local inhtmr = tmr.create()
-
 -- and now we get to the lamp stuff
 remotefb = ws2812.newBuffer(32,3)
 ledfb = remotefb -- points at whichever buffer is appropriate to draw
@@ -58,16 +56,26 @@ function dodraw()
       -- bits after summation, so adding 127 more means that we now round up
       -- (i.e., by ceil), so an active channel will remain active.
       doublefb:mix(127,baselinefb,256/(dimfactor+1),ledfb)
-      gpio.write(3,gpio.HIGH) ws2812.write(doublefb)
+      gpio.write(3,gpio.HIGH)
+      ws2812.write(doublefb)
     else
-      gpio.write(3,gpio.HIGH) ws2812.write(ledfb)
+      gpio.write(3,gpio.HIGH)
+      ws2812.write(ledfb)
     end
-    -- Kick the inhibit timer to turn off the AND gate in 2 msec.  That should
-    -- be ample time to drain the serial UART.  If we get here again, we'll end
-    -- up resetting the timer's firing time, making this something like a
-    -- watchdog.  Hopefully we won't crash in the interim.
-    inhtmr:alarm(2,tmr.ALARM_SINGLE,function() gpio.write(3,gpio.LOW) end)
+    -- Wait for the UART to drain and for the LED strip to latch (nominally
+    -- 350 usec).  This isn't really OK, but we're probably not pushing the
+    -- 15 mSec or so that the SDK says we have?
+    tmr.delay(350)
+    gpio.write(3,gpio.LOW)
   end
+end
+-- Not ideal, but at least this keeps all the gpio wibbling to this one file
+function doblackout()
+  isblackout = true
+  gpio.write(3,gpio.HIGH)
+    ws2812.write(string.char(0):rep(32*3))
+    tmr.delay(350)
+  gpio.write(3,gpio.LOW)
 end
 
 function removeremote()

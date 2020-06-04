@@ -1,4 +1,5 @@
--- globals referenced: isblackout, dimfactor, isDim, dodraw, ledfb, remotefb, remotetmr, lamp_announce, tq, loaddrawfn
+-- globals referenced: isblackout, doblackout, dimfactor, isDim, dodraw, ledfb, remotefb, \
+--                     remotetmr, lamp_announce, tq, loaddrawfn
 --
 -- globals asserted: touchcolor, touchlastfn
 --
@@ -48,10 +49,7 @@ local set0 = function(o) return bit.bor(o,0x01) end
 local clear0 = function(o) return bit.band(o,0xFE) end
 local function setblackout(nb)
   if nb then
-    isblackout = true
-    gpio.write(3,gpio.HIGH)
-    ws2812.write(string.char(0):rep(32*3))
-    gpio.write(3,gpio.LOW)
+    doblackout()
     cap:mr(0x81,function(o) return bit.bor(o,0x03) end) -- breathe
     cap:mr(0x74,set0) -- drive
     cap:mr(0x72,clear0) -- unlink
