@@ -9,6 +9,8 @@ ws2812.write(fb)
 tmr.delay(350)
 gpio.write(3,gpio.LOW)
 
+gpio.mode(4, gpio.INPUT) -- de-initialize ws2812 to turn off on-module blue LED
+
 -- Do we have a new LFS blob?  If so, install it.
 file.remove("luac.out.stage")
 if file.exists("luac.out") then

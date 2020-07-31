@@ -46,6 +46,7 @@ baselinefb:fill(1,1,1)
 local doublefb = ws2812.newBuffer(32,3)
 function dodraw()
   if not isblackout then
+    local b = ledfb
     if dimfactor > 0 then
       -- dimming, so mix the baseline "all channels on minimum" as 127/256ths
       -- to control rounding (see below).  The image in "ledfb" will be mixed
@@ -56,26 +57,28 @@ function dodraw()
       -- bits after summation, so adding 127 more means that we now round up
       -- (i.e., by ceil), so an active channel will remain active.
       doublefb:mix(127,baselinefb,256/(dimfactor+1),ledfb)
-      gpio.write(3,gpio.HIGH)
-      ws2812.write(doublefb)
-    else
-      gpio.write(3,gpio.HIGH)
-      ws2812.write(ledfb)
+      b = doublefb
     end
+    gpio.write(3,gpio.HIGH)
+    ws2812.init(ws2812.MODE_SINGLE)
+    ws2812.write(b)
     -- Wait for the UART to drain and for the LED strip to latch (nominally
     -- 350 usec).  This isn't really OK, but we're probably not pushing the
     -- 15 mSec or so that the SDK says we have?
     tmr.delay(350)
     gpio.write(3,gpio.LOW)
+    gpio.mode(4,gpio.INPUT) -- LED off
   end
 end
 -- Not ideal, but at least this keeps all the gpio wibbling to this one file
 function doblackout()
   isblackout = true
   gpio.write(3,gpio.HIGH)
+  ws2812.init(ws2812.MODE_SINGLE)
     ws2812.write(string.char(0):rep(32*3))
     tmr.delay(350)
   gpio.write(3,gpio.LOW)
+  gpio.mode(4,gpio.INPUT) -- LED off
 end
 
 function removeremote()
