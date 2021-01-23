@@ -16,7 +16,7 @@ fi
 
 dopushcompile lamp-touch.lua
 dopushcompile lamp-remote.lua
-dopushcompile telnetd-cap.lua
+dopushcompile telnetd-lamp.lua
 #dopushtext    conf/nwfmqtt.conf
 #dopushtext    conf/nwfmqtt.subs
 dopushlua     init-early.lua

@@ -18,7 +18,7 @@ SOURCES=(
   init-early.lua
   lamp-remote.lua
   lamp-touch.lua
-  telnetd-cap.lua
+  telnetd-lamp.lua
 
   draw-*.lua
 )
